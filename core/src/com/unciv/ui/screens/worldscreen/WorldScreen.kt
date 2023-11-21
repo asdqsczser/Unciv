@@ -202,6 +202,7 @@ class WorldScreen(
                 if (isNextTurnUpdateRunning() || game.onlineMultiplayer.hasLatestGameState(gameInfo, it.preview)) {
                     return@receive
                 }
+                // 多人游戏更新最新的服务器存档
                 Concurrency.run("Load latest multiplayer state") {
                     loadLatestMultiplayerState()
                 }
@@ -603,6 +604,7 @@ class WorldScreen(
 
             if (originalGameInfo.gameParameters.isOnlineMultiplayer) {
                 try {
+                    //多人游戏上传最新存档
                     game.onlineMultiplayer.updateGame(gameInfoClone)
                 }catch (ex: Exception) {
                     when (ex) {
@@ -646,6 +648,7 @@ class WorldScreen(
             debug("Next turn took %sms", System.currentTimeMillis() - startTime)
 
             // Special case: when you are the only alive human player, the game will always be up to date
+            //多人游戏 通过isUpToDate来控制是否等待其他玩家
             if (gameInfo.gameParameters.isOnlineMultiplayer
                     && gameInfoClone.civilizations.count { it.isAlive() && it.playerType == PlayerType.Human } == 1) {
                 gameInfoClone.isUpToDate = true

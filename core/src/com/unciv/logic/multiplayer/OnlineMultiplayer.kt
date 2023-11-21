@@ -330,6 +330,7 @@ class OnlineMultiplayer {
      */
     fun hasLatestGameState(gameInfo: GameInfo, preview: GameInfoPreview): Boolean {
         // TODO look into how to maybe extract interfaces to not make this take two different methods
+        //多人游戏 判断是否需要加载get到的存档?
         return gameInfo.currentPlayer == preview.currentPlayer
                 && gameInfo.turns == preview.turns
     }

@@ -363,6 +363,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         val isOnline = gameParameters.isOnlineMultiplayer
 
         // We process player automatically if:
+        // AI的逻辑入口
         while (isSimulation() ||                    // simulation is active
                 player.isAI() ||                    // or player is AI
                 isOnline && (player.isDefeated() || // or player is online defeated
