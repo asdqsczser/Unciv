@@ -599,7 +599,7 @@ class WorldScreen(
             gameInfoClone.setTransients()  // this can get expensive on large games, not the clone itself
 
             progressBar.increment()
-
+            //多人游戏 改为先上传再AI? 但这里没有load
             gameInfoClone.nextTurn(progressBar)
 
             if (originalGameInfo.gameParameters.isOnlineMultiplayer) {
@@ -641,6 +641,7 @@ class WorldScreen(
                 }
 
             }
+
 
             if (game.gameInfo != originalGameInfo) // while this was turning we loaded another game
                 return@runOnNonDaemonThreadPool
