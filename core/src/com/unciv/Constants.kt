@@ -16,9 +16,6 @@ object Constants {
     /** The "Coastal" terrain _filter_ */
     const val coastal = "Coastal"
 
-    /** Used as filter and the name of the pseudo-TerrainFeature defining river Stats */
-    const val river = "River"
-
     const val mountain = "Mountain"
     const val hill = "Hill"
     const val plains = "Plains"
@@ -91,8 +88,7 @@ object Constants {
     const val uniqueOrDelimiter = "\" OR \""
 
     const val dropboxMultiplayerServer = "Dropbox"
-    const val uncivXyzServer = "https://uncivserver.xyz"
-
+    const val uncivXyzServer = "http://sl.office.fuxi.netease.com:44952"//"https://uncivserver.xyz"
     const val defaultTileset = "HexaRealm"
     /** Default for TileSetConfig.fallbackTileSet - Don't change unless you've also moved the crosshatch, borders, and arrows as well */
     const val defaultFallbackTileset = "FantasyHex"

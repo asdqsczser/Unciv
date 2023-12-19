@@ -3,7 +3,6 @@ package com.unciv.logic.map.tile
 import com.unciv.Constants
 import com.unciv.logic.city.City
 import com.unciv.logic.civilization.Civilization
-import com.unciv.models.ruleset.tile.Terrain
 import com.unciv.models.ruleset.tile.TileImprovement
 import com.unciv.models.ruleset.unique.LocalUniqueCache
 import com.unciv.models.ruleset.unique.StateForConditionals
@@ -13,7 +12,6 @@ import com.unciv.models.stats.Stats
 import com.unciv.ui.components.extensions.toPercent
 
 class TileStatFunctions(val tile: Tile) {
-    private val riverTerrain by lazy { tile.ruleset.terrains[Constants.river] }
 
     fun getTileStats(
         observingCiv: Civilization?,
@@ -30,7 +28,7 @@ class TileStatFunctions(val tile: Tile) {
 
         if (city != null) {
             val statsFromTilesUniques =
-                    localUniqueCache.forCityGetMatchingUniques(
+                    localUniqueCache.forCityGetMatchingUniques(//消耗大
                             city, UniqueType.StatsFromTiles,
                         stateForConditionals)
                         .filter { city.matchesFilter(it.params[2]) }
@@ -55,15 +53,7 @@ class TileStatFunctions(val tile: Tile) {
             }
         }
 
-        if (tile.isAdjacentToRiver()) {
-            if (riverTerrain == null)
-                stats.gold++  // Fallback for legacy mods
-            else
-                //TODO this is one approach to get these stats in - supporting only the Stats UniqueType.
-                //     Alternatives: append riverTerrain to allTerrains, or append riverTerrain.uniques to
-                //     the Tile's UniqueObjects/UniqueMap (while copying onl<e> base Stats directly here)
-                stats.add(getSingleTerrainStats(riverTerrain!!, stateForConditionals))
-        }
+        if (tile.isAdjacentToRiver()) stats.gold++
 
         if (observingCiv != null) {
             // resource base
@@ -71,7 +61,7 @@ class TileStatFunctions(val tile: Tile) {
 
             val improvement = tile.getUnpillagedTileImprovement()
             if (improvement != null)
-                stats.add(getImprovementStats(improvement, observingCiv, city, localUniqueCache))
+                stats.add(getImprovementStats(improvement, observingCiv, city, localUniqueCache))//消耗大
 
             if (stats.gold != 0f && observingCiv.goldenAges.isGoldenAge())
                 stats.gold++
@@ -102,37 +92,28 @@ class TileStatFunctions(val tile: Tile) {
         }
     }
 
-    /** Gets stats of a single Terrain, unifying the Stats class a Terrain inherits and the Stats Unique
-     *  @return A Stats reference, must not be mutated
-     */
-    private fun getSingleTerrainStats(terrain: Terrain, stateForConditionals: StateForConditionals): Stats {
-        var stats: Stats = terrain
-
-        for (unique in terrain.getMatchingUniques(UniqueType.Stats, stateForConditionals)) {
-            if (stats === terrain)
-                stats = stats.clone()
-            stats.add(unique.stats)
-        }
-        return stats
-    }
-
     /** Gets basic stats to start off [getTileStats] or [getTileStartYield], independently mutable result */
     private fun getTerrainStats(stateForConditionals: StateForConditionals = StateForConditionals()): Stats {
-        var stats = Stats()
+        var stats: Stats? = null
 
         // allTerrains iterates over base, natural wonder, then features
         for (terrain in tile.allTerrains) {
-            val terrainStats = getSingleTerrainStats(terrain, stateForConditionals)
+            for (unique in terrain.getMatchingUniques(UniqueType.Stats, stateForConditionals)) {
+                if (stats == null) {
+                    stats = unique.stats.clone()
+                }
+                else stats.add(unique.stats)
+            }
             when {
                 terrain.hasUnique(UniqueType.NullifyYields, stateForConditionals) ->
-                    return terrainStats.clone()
-                terrain.overrideStats ->
-                    stats = terrainStats.clone()
+                    return terrain.cloneStats()
+                terrain.overrideStats || stats == null ->
+                    stats = terrain.cloneStats()
                 else ->
-                    stats.add(terrainStats)
+                    stats.add(terrain)
             }
         }
-        return stats
+        return stats ?: Stats.ZERO // For tests
     }
 
     // Only gets the tile percentage bonus, not the improvement percentage bonus
@@ -279,7 +260,7 @@ class TileStatFunctions(val tile: Tile) {
     ): Stats {
         val stats = Stats()
 
-        fun statsFromTiles() {
+        fun statsFromTiles(){
             val tileUniques = uniqueCache.forCityGetMatchingUniques(city, UniqueType.StatsFromTiles, conditionalState)
                 .filter { city.matchesFilter(it.params[2]) }
             val improvementUniques =

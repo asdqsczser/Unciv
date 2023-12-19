@@ -143,7 +143,6 @@ class OnlineMultiplayerServer(
     }
 
     /**
-     * 多人游戏 下载服务器端存档
      * @throws FileStorageRateLimitReached if the file storage backend can't handle any additional actions for a time
      * @throws FileNotFoundException if the file can't be found
      */

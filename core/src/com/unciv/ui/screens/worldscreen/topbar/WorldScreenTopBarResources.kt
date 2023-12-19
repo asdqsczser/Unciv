@@ -14,17 +14,15 @@ import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toStringSigned
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.onClick
-import com.unciv.ui.components.widgets.ScalingTableWrapper
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
 import com.unciv.ui.screens.victoryscreen.VictoryScreen
 
-internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTableWrapper() {
+internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : Table() {
     private val turnsLabel = "Turns: 0/400".toLabel()
     private data class ResourceActors(val resource: TileResource, val label: Label, val icon: Group)
     private val resourceActors = ArrayList<ResourceActors>(12)
     private val resourcesWrapper = Table()
-    val worldScreen = topbar.worldScreen
 
     // Note: For a proper functioning of the "shift floating buttons down when cramped" feature, it is
     // important that this entire Widget has only the bare minimum padding to its left and right.
@@ -48,6 +46,7 @@ internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTa
         resourcesWrapper.defaults().space(defaultPad)
         resourcesWrapper.touchable = Touchable.enabled
 
+        val worldScreen = topbar.worldScreen
         turnsLabel.onClick {
             if (worldScreen.selectedCiv.isLongCountDisplay()) {
                 val gameInfo = worldScreen.selectedCiv.gameInfo
@@ -78,8 +77,6 @@ internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTa
     }
 
     fun update(civInfo: Civilization) {
-        resetScale()
-
         val yearText = YearTextUtil.toYearText(
             civInfo.gameInfo.getYear(), civInfo.isLongCountDisplay()
         )
@@ -111,6 +108,6 @@ internal class WorldScreenTopBarResources(topbar: WorldScreenTopBar) : ScalingTa
             resourcesWrapper.add(label).padTop(resourceAmountDescentTweak)  // digits don't have descenders, so push them down a little
         }
 
-        scaleTo(worldScreen.stage.width)
+        pack()
     }
 }

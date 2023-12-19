@@ -300,7 +300,7 @@ class TurnManager(val civInfo: Civilization) {
         updateWinningCiv() // Maybe we did something this turn to win
     }
 
-    fun updateWinningCiv() {
+    fun updateWinningCiv(){
         if (civInfo.gameInfo.victoryData != null) return // Game already won
 
         val victoryType = civInfo.victoryManager.getVictoryTypeAchieved()
@@ -325,7 +325,19 @@ class TurnManager(val civInfo: Civilization) {
 
         // Do stuff
         NextTurnAutomation.automateCivMoves(civInfo)
+//         NextTurnAutomation.automateCivMoves_modify(civInfo,Diplomacy_flag)
+        // Update barbarian camps
+        if (civInfo.isBarbarian() && !civInfo.gameInfo.gameParameters.noBarbarians)
+            civInfo.gameInfo.barbarians.updateEncampments()
+    }
+    fun automateTurn_modify(Diplomacy_flag : Boolean,workerAuto:Boolean) {
+        // Defeated civs do nothing
+        if (civInfo.isDefeated())
+            return
 
+        // Do stuff
+//         NextTurnAutomation.automateCivMoves(civInfo)
+        NextTurnAutomation.automateCivMoves_modify(civInfo,Diplomacy_flag,workerAuto)
         // Update barbarian camps
         if (civInfo.isBarbarian() && !civInfo.gameInfo.gameParameters.noBarbarians)
             civInfo.gameInfo.barbarians.updateEncampments()

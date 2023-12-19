@@ -130,7 +130,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     @Transient
     var neutralRoads = HashSet<Vector2>()
 
-    var playerType = PlayerType.AI
+    open var playerType = PlayerType.AI
 
     /** Used in online multiplayer for human players */
     var playerId = ""
@@ -321,9 +321,9 @@ class Civilization : IsPartOfGameInfoSerialization {
     fun knows(otherCiv: Civilization) = knows(otherCiv.civName)
 
     fun getCapital(firstCityIfNoCapital: Boolean = false) = cities.firstOrNull { it.isCapital() } ?:
-        if (firstCityIfNoCapital) cities.firstOrNull() else null
-    fun isHuman() = playerType == PlayerType.Human
-    fun isAI() = playerType == PlayerType.AI
+    if (firstCityIfNoCapital) cities.firstOrNull() else null
+    open fun isHuman() = playerType == PlayerType.Human
+    open fun isAI() = playerType == PlayerType.AI
     fun isOneCityChallenger() = playerType == PlayerType.Human && gameInfo.gameParameters.oneCityChallenge
 
     fun isCurrentPlayer() = gameInfo.currentPlayerCiv == this
@@ -342,7 +342,7 @@ class Civilization : IsPartOfGameInfoSerialization {
 
 
     fun hasMetCivTerritory(otherCiv: Civilization): Boolean =
-            otherCiv.getCivTerritory().any { gameInfo.tileMap[it].isExplored(this) }
+        otherCiv.getCivTerritory().any { gameInfo.tileMap[it].isExplored(this) }
     fun getCompletedPolicyBranchesCount(): Int = policies.adoptedPolicies.count { Policy.isBranchCompleteByName(it) }
     fun originalMajorCapitalsOwned(): Int = cities.count { it.isOriginalCapital && it.foundingCiv != "" && gameInfo.getCivilization(it.foundingCiv).isMajorCiv() }
     private fun getCivTerritory() = cities.asSequence().flatMap { it.tiles.asSequence() }
@@ -353,14 +353,14 @@ class Civilization : IsPartOfGameInfoSerialization {
             return victoryTypes.first() // That is the most relevant one
         val victoryType = nation.preferredVictoryType
         return if (victoryType in gameInfo.ruleset.victories) victoryType
-               else Constants.neutralVictoryType
+        else Constants.neutralVictoryType
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun getPreferredVictoryTypeObject(): Victory? {
         val preferredVictoryType = getPreferredVictoryType()
         return if (preferredVictoryType == Constants.neutralVictoryType) null
-               else gameInfo.ruleset.victories[getPreferredVictoryType()]!!
+        else gameInfo.ruleset.victories[getPreferredVictoryType()]!!
     }
 
     fun wantsToFocusOn(focus: Victory.Focus): Boolean {
@@ -491,7 +491,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     }
 
     fun matchesFilter(filter: String): Boolean {
-        return when (filter) {
+        return when (filter){
             "Human player" -> isHuman()
             "AI player" -> isAI()
             else -> nation.matchesFilter(filter)
@@ -580,16 +580,16 @@ class Civilization : IsPartOfGameInfoSerialization {
     fun getStatForRanking(category: RankingType): Int {
         return if (isDefeated()) 0
         else when (category) {
-                RankingType.Score -> calculateTotalScore().toInt()
-                RankingType.Population -> cities.sumOf { it.population.population }
-                RankingType.CropYield -> stats.statsForNextTurn.food.roundToInt()
-                RankingType.Production -> stats.statsForNextTurn.production.roundToInt()
-                RankingType.Gold -> gold
-                RankingType.Territory -> cities.sumOf { it.tiles.size }
-                RankingType.Force -> getMilitaryMight()
-                RankingType.Happiness -> getHappiness()
-                RankingType.Technologies -> tech.researchedTechnologies.size
-                RankingType.Culture -> policies.adoptedPolicies.count { !Policy.isBranchCompleteByName(it) }
+            RankingType.Score -> calculateTotalScore().toInt()
+            RankingType.Population -> cities.sumOf { it.population.population }
+            RankingType.CropYield -> stats.statsForNextTurn.food.roundToInt()
+            RankingType.Production -> stats.statsForNextTurn.production.roundToInt()
+            RankingType.Gold -> gold
+            RankingType.Territory -> cities.sumOf { it.tiles.size }
+            RankingType.Force -> getMilitaryMight()
+            RankingType.Happiness -> getHappiness()
+            RankingType.Technologies -> tech.researchedTechnologies.size
+            RankingType.Culture -> policies.adoptedPolicies.count { !Policy.isBranchCompleteByName(it) }
         }
     }
 
@@ -655,7 +655,7 @@ class Civilization : IsPartOfGameInfoSerialization {
      *  */
     fun setNationTransient() {
         nation = gameInfo.ruleset.nations[civName]
-                ?: throw UncivShowableException("Nation $civName is not found!")
+            ?: throw UncivShowableException("Nation $civName is not found!")
     }
 
     fun setTransients() {
@@ -709,21 +709,21 @@ class Civilization : IsPartOfGameInfoSerialization {
     fun getTurnsTillCallForBarbHelp() = flagsCountdown[CivFlags.TurnsTillCallForBarbHelp.name]
 
     fun mayVoteForDiplomaticVictory() =
-        // Does not need checks for Barbarians or dead civs because the callers already ensure that
+    // Does not need checks for Barbarians or dead civs because the callers already ensure that
         // (NextTurnAutomation.tryVoteForDiplomaticVictory and NextTurnAction.WorldCongressVote)
         !isSpectator()
-        && getTurnsTillNextDiplomaticVote() == 0
-        && civName !in gameInfo.diplomaticVictoryVotesCast.keys
-        // Only vote if there is someone to vote for, may happen in one-more-turn mode
-        && gameInfo.civilizations.any { it.isMajorCiv() && !it.isDefeated() && it != this }
+            && getTurnsTillNextDiplomaticVote() == 0
+            && civName !in gameInfo.diplomaticVictoryVotesCast.keys
+            // Only vote if there is someone to vote for, may happen in one-more-turn mode
+            && gameInfo.civilizations.any { it.isMajorCiv() && !it.isDefeated() && it != this }
 
     fun diplomaticVoteForCiv(chosenCivName: String?) {
         gameInfo.diplomaticVictoryVotesCast[civName] = chosenCivName
     }
 
     fun shouldShowDiplomaticVotingResults() =
-         flagsCountdown[CivFlags.ShowDiplomaticVotingResults.name] == 0
-         && gameInfo.civilizations.any { it.isMajorCiv() && !it.isDefeated() && it != this }
+        flagsCountdown[CivFlags.ShowDiplomaticVotingResults.name] == 0
+            && gameInfo.civilizations.any { it.isMajorCiv() && !it.isDefeated() && it != this }
 
 
     /** Modify gold by a given amount making sure it does neither overflow nor underflow.
@@ -746,18 +746,18 @@ class Civilization : IsPartOfGameInfoSerialization {
         }
     }
 
-    fun addStats(stats: Stats) {
+    fun addStats(stats: Stats){
         for ((stat, amount) in stats) addStat(stat, amount.toInt())
     }
 
     fun addStat(stat: Stat, amount: Int) {
         when (stat) {
             Stat.Culture -> { policies.addCulture(amount)
-                              if(amount > 0) totalCultureForContests += amount }
+                if(amount > 0) totalCultureForContests += amount }
             Stat.Science -> tech.addScience(amount)
             Stat.Gold -> addGold(amount)
             Stat.Faith -> { religionManager.storedFaith += amount
-                            if(amount > 0) totalFaithForContests += amount }
+                if(amount > 0) totalFaithForContests += amount }
             else -> {}
             // Food and Production wouldn't make sense to be added nationwide
             // Happiness cannot be added as it is recalculated again, use a unique instead
@@ -801,24 +801,11 @@ class Civilization : IsPartOfGameInfoSerialization {
         newCity.cityConstructions.chooseNextConstruction()
     }
 
-    /** Destroy what's left of a Civilization
-     *
-     * - function expects cities.isEmpty()
-     * - remaining units are destroyed and diplomacy cleaned up
-     * @param notificationLocation if given *and* the civ receiving the notification can see the tile or knows there was a city there, then the notification can show this location on click
-     */
-    // At the moment, the "last unit down" callers do not pass a location, the city ones do - because the former isn't interesting
-    fun destroy(notificationLocation: Vector2? = null) {
+    fun destroy() {
         val destructionText = if (isMajorCiv()) "The civilization of [$civName] has been destroyed!"
-            else "The City-State of [$civName] has been destroyed!"
-        for (civ in gameInfo.civilizations) {
-            if (civ.isDefeated()) continue // addNotification will ignore barbarians and other AI
-            val location = notificationLocation?.takeIf {
-                val tile = gameInfo.tileMap[notificationLocation]
-                tile.isVisible(civ) || tile.isExplored(civ) && tile.getShownImprovement(civ) == Constants.cityCenter
-            }
-            civ.addNotification(destructionText, LocationAction(location), NotificationCategory.General, civName, NotificationIcon.Death)
-        }
+        else "The City-State of [$civName] has been destroyed!"
+        for (civ in gameInfo.civilizations)
+            civ.addNotification(destructionText, NotificationCategory.General, civName, NotificationIcon.Death)
         units.getCivUnits().forEach { it.destroy() }
         tradeRequests.clear() // if we don't do this then there could be resources taken by "pending" trades forever
         for (diplomacyManager in diplomacy.values) {

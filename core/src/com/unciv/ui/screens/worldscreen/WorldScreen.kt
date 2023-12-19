@@ -11,8 +11,10 @@ import com.unciv.Constants
 import com.unciv.UncivGame
 import com.unciv.logic.GameInfo
 import com.unciv.logic.UncivShowableException
+import com.unciv.logic.civilization.AlertType
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.PlayerType
+import com.unciv.logic.civilization.PopupAlert
 import com.unciv.logic.civilization.diplomacy.DiplomaticStatus
 import com.unciv.logic.event.EventBus
 import com.unciv.logic.map.MapVisualization
@@ -87,7 +89,7 @@ class WorldScreen(
 ) : BaseScreen() {
     /** When set, causes the screen to update in the next [render][BaseScreen.render] event */
     var shouldUpdate = false
-
+    var fiststartgame = false
     /** Indicates it's the player's ([viewingCiv]) turn */
     var isPlayersTurn = viewingCiv.isCurrentPlayer()
         internal set     // only this class is allowed to make changes
@@ -202,7 +204,6 @@ class WorldScreen(
                 if (isNextTurnUpdateRunning() || game.onlineMultiplayer.hasLatestGameState(gameInfo, it.preview)) {
                     return@receive
                 }
-                // 多人游戏更新最新的服务器存档
                 Concurrency.run("Load latest multiplayer state") {
                     loadLatestMultiplayerState()
                 }
@@ -231,6 +232,7 @@ class WorldScreen(
         newGameSetupInfo.mapParameters.reseed()
         val newGameScreen = NewGameScreen(newGameSetupInfo)
         game.pushScreen(newGameScreen)
+
     }
 
     fun openSaveGameScreen() {
@@ -277,10 +279,10 @@ class WorldScreen(
     }
 
     // Handle disabling and re-enabling WASD listener while Options are open
-    override fun openOptionsPopup(startingPage: Int, withDebug: Boolean, onClose: () -> Unit) {
+    override fun openOptionsPopup(startingPage: Int, onClose: () -> Unit) {
         val oldListener = stage.root.listeners.filterIsInstance<KeyboardPanningListener>().firstOrNull()
         if (oldListener != null) stage.removeListener(oldListener)
-        super.openOptionsPopup(startingPage, withDebug) {
+        super.openOptionsPopup(startingPage) {
             addKeyboardListener()
             onClose()
         }
@@ -599,12 +601,11 @@ class WorldScreen(
             gameInfoClone.setTransients()  // this can get expensive on large games, not the clone itself
 
             progressBar.increment()
-            //多人游戏 改为先上传再AI? 但这里没有load
+
             gameInfoClone.nextTurn(progressBar)
 
             if (originalGameInfo.gameParameters.isOnlineMultiplayer) {
                 try {
-                    //多人游戏上传最新存档
                     game.onlineMultiplayer.updateGame(gameInfoClone)
                 }catch (ex: Exception) {
                     when (ex) {
@@ -642,14 +643,12 @@ class WorldScreen(
 
             }
 
-
             if (game.gameInfo != originalGameInfo) // while this was turning we loaded another game
                 return@runOnNonDaemonThreadPool
 
             debug("Next turn took %sms", System.currentTimeMillis() - startTime)
 
             // Special case: when you are the only alive human player, the game will always be up to date
-            //多人游戏 通过isUpToDate来控制是否等待其他玩家
             if (gameInfo.gameParameters.isOnlineMultiplayer
                     && gameInfoClone.civilizations.count { it.isAlive() && it.playerType == PlayerType.Human } == 1) {
                 gameInfoClone.isUpToDate = true

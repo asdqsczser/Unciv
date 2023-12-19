@@ -20,7 +20,7 @@ open class AndroidLauncher : AndroidApplication() {
         super.onCreate(savedInstanceState)
 
         // Setup Android logging
-        Log.backend = AndroidLogBackend(this)
+        Log.backend = AndroidLogBackend()
 
         // Setup Android display
         Display.platform = AndroidDisplay(this)
@@ -109,3 +109,5 @@ open class AndroidLauncher : AndroidApplication() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 }
+
+class AndroidTvLauncher:AndroidLauncher()

@@ -3,7 +3,6 @@ package com.unciv.ui.screens.mapeditorscreen.tabs
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.logic.map.BFS
@@ -13,18 +12,15 @@ import com.unciv.logic.map.mapgenerator.RiverGenerator
 import com.unciv.logic.map.tile.Tile
 import com.unciv.models.ruleset.Ruleset
 import com.unciv.models.translations.tr
+import com.unciv.ui.components.widgets.TabbedPager
+import com.unciv.ui.components.widgets.UncivSlider
 import com.unciv.ui.components.extensions.addSeparator
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.input.KeyCharAndCode
-import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.keyShortcuts
-import com.unciv.ui.components.input.onActivation
-import com.unciv.ui.components.widgets.TabbedPager
-import com.unciv.ui.components.widgets.UncivSlider
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.popups.ToastPopup
 import com.unciv.ui.screens.basescreen.BaseScreen
-import com.unciv.ui.screens.civilopediascreen.CivilopediaScreen
 import com.unciv.ui.screens.civilopediascreen.FormattedLine
 import com.unciv.ui.screens.mapeditorscreen.MapEditorScreen
 import com.unciv.ui.screens.mapeditorscreen.TileInfoNormalizer
@@ -140,43 +136,27 @@ class MapEditorEditTab(
 
     private fun selectPage(index: Int) = subTabs.selectPage(index)
 
-    private fun linkCivilopedia(brushActor: Actor, link: String) {
-        if (link.isEmpty()) return
-        brushActor.touchable = Touchable.enabled
-        // As so often, doing the binding separately to avoid the tooltip
-        brushActor.onActivation {
-            editorScreen.game.pushScreen(CivilopediaScreen(ruleset, link = link))
-        }
-        brushActor.keyShortcuts.add(KeyboardBinding.Civilopedia)
-    }
-
-    // "Normal" setBrush overload, using named RulesetObject icon
-    fun setBrush(name: String, icon: String, pediaLink: String = icon, isRemove: Boolean = false, applyAction: (Tile)->Unit) {
+    fun setBrush(name: String, icon: String, isRemove: Boolean = false, applyAction: (Tile)->Unit) {
         brushHandlerType = BrushHandlerType.Tile
-        val brushActor = FormattedLine(name, icon = icon, iconCrossed = isRemove).render(0f)
-        linkCivilopedia(brushActor, pediaLink)
-        brushCell.setActor(brushActor)
+        brushCell.setActor(FormattedLine(name, icon = icon, iconCrossed = isRemove).render(0f))
         brushAction = applyAction
     }
-    // Helper overload for brushes using icons not existing as RulesetObject
-    private fun setBrush(name: String, icon: Actor, pediaLink: String, applyAction: (Tile)->Unit) {
+    private fun setBrush(name: String, icon: Actor, applyAction: (Tile)->Unit) {
         brushHandlerType = BrushHandlerType.Tile
         val line = Table().apply {
             add(icon).padRight(10f)
             add(name.toLabel())
         }
-        linkCivilopedia(line, pediaLink)
         brushCell.setActor(line)
         brushAction = applyAction
     }
-    // This overload is used by Roads and Starting locations
-    fun setBrush(handlerType: BrushHandlerType, name: String, icon: String, pediaLink: String = icon, isRemove: Boolean = false, applyAction: (Tile)->Unit) {
-        setBrush(name, icon, pediaLink, isRemove, applyAction)
+    fun setBrush(handlerType: BrushHandlerType, name: String, icon: String,
+                 isRemove: Boolean = false, applyAction: (Tile)->Unit) {
+        setBrush(name, icon, isRemove, applyAction)
         brushHandlerType = handlerType
     }
-    // This overload is used by Rivers
-    fun setBrush(handlerType: BrushHandlerType, name: String, icon: Actor, pediaLink: String, applyAction: (Tile)->Unit) {
-        setBrush(name, icon, pediaLink, applyAction)
+    fun setBrush(handlerType: BrushHandlerType, name: String, icon: Actor, applyAction: (Tile)->Unit) {
+        setBrush(name, icon, applyAction)
         brushHandlerType = handlerType
     }
 

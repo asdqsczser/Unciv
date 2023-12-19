@@ -1,7 +1,7 @@
 package com.unciv.logic.files
-
-import com.badlogic.gdx.Files
 import com.badlogic.gdx.Gdx
+import com.unciv.logic.files.UncivFiles
+import com.badlogic.gdx.Files
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.JsonReader
@@ -25,6 +25,7 @@ import com.unciv.utils.debug
 import java.io.File
 import java.io.Writer
 import kotlinx.coroutines.Job
+import com.unciv.models.ruleset.RulesetCache
 
 private const val SAVE_FILES_FOLDER = "SaveFiles"
 private const val MULTIPLAYER_FILES_FOLDER = "MultiplayerGames"
@@ -64,8 +65,8 @@ class UncivFiles(
         val externalFile = files.external(location)
 
         val toReturn = if (files.isExternalStorageAvailable && (
-                        preferExternalStorage && (externalFile.exists() || !localFile.exists())
-                        || !preferExternalStorage && (externalFile.exists() && !localFile.exists())
+                preferExternalStorage && (externalFile.exists() || !localFile.exists())
+                    || !preferExternalStorage && (externalFile.exists() && !localFile.exists())
                 ) ) {
             externalFile
         } else {
@@ -225,7 +226,7 @@ class UncivFiles(
     //region Loading
 
     fun loadGameByName(gameName: String) =
-            loadGameFromFile(getSave(gameName))
+        loadGameFromFile(getSave(gameName))
 
     fun loadGameFromFile(gameFile: FileHandle): GameInfo {
         val gameData = gameFile.readString(Charsets.UTF_8.name())
@@ -236,7 +237,7 @@ class UncivFiles(
     }
 
     fun loadGamePreviewByName(gameName: String) =
-            loadGamePreviewFromFile(getMultiplayerSave(gameName))
+        loadGamePreviewFromFile(getMultiplayerSave(gameName))
 
     fun loadGamePreviewFromFile(gameFile: FileHandle): GameInfoPreview {
         return json().fromJson(GameInfoPreview::class.java, gameFile) ?: throw emptyFile(gameFile)
@@ -363,7 +364,29 @@ class UncivFiles(
             gameInfo.setTransients()
             return gameInfo
         }
+        fun gameInfoFromString_easy(gameData: String): GameInfo {
 
+            RulesetCache.loadRulesets(true,false)
+            val unzippedJson = try {
+                Gzip.unzip(gameData.trim())
+            } catch (_: Exception) {
+                gameData.trim()
+            }
+            val gameInfo = try {
+                json().fromJson(GameInfo::class.java, unzippedJson)
+            } catch (ex: Exception) {
+                Log.error("Exception while deserializing GameInfo JSON", ex)
+                val onlyVersion = json().fromJson(GameInfoSerializationVersion::class.java, unzippedJson)
+                throw IncompatibleGameInfoVersionException(onlyVersion.version, ex)
+            } ?: throw UncivShowableException("The file data seems to be corrupted.")
+
+            if (gameInfo.version > GameInfo.CURRENT_COMPATIBILITY_VERSION) {
+                // this means there wasn't an immediate error while serializing, but this version will cause other errors later down the line
+                throw IncompatibleGameInfoVersionException(gameInfo.version)
+            }
+            gameInfo.setTransients()
+            return gameInfo
+        }
         /**
          * Parses [gameData] as gzipped serialization of a [GameInfoPreview]
          * @throws SerializationException
@@ -465,6 +488,6 @@ class IncompatibleGameInfoVersionException(
     cause: Throwable? = null
 ) : UncivShowableException(
     "The save was created with an incompatible version of Unciv: [${version.createdWith.toNiceString()}]. " +
-            "Please update Unciv to this version or later and try again.",
+        "Please update Unciv to this version or later and try again.",
     cause
 ), HasGameInfoSerializationVersion

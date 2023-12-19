@@ -47,7 +47,7 @@ enum class UniqueParameterType(
         }
     },
 
-    Fraction("fraction", docExample = "0.5", "Indicates a fractional number, which can be negative") {
+    Fraction("fraction", docExample = "0.5", "Indicates a fractional number, which can be negative"){
         override fun getErrorSeverity(parameterText: String, ruleset: Ruleset): UniqueType.UniqueParameterErrorSeverity? {
             return if (parameterText.toFloatOrNull () == null) UniqueType.UniqueParameterErrorSeverity.RulesetInvariant
             else null
@@ -285,7 +285,7 @@ enum class UniqueParameterType(
     /** Implemented by [Tile.matchesTerrainFilter][com.unciv.logic.map.tile.Tile.matchesTerrainFilter] */
     TerrainFilter("terrainFilter", Constants.freshWaterFilter, null, "Terrain Filters") {
         private val knownValues = setOf("All",
-                Constants.coastal, Constants.river, "Open terrain", "Rough terrain", "Water resource",
+                Constants.coastal, "River", "Open terrain", "Rough terrain", "Water resource",
                 "Foreign Land", "Foreign", "Friendly Land", "Friendly", "Enemy Land", "Enemy",
                 "Featureless", Constants.freshWaterFilter, "non-fresh water", "Natural Wonder",
                 "Impassable", "Land", "Water") +
@@ -391,7 +391,7 @@ enum class UniqueParameterType(
     },
 
     /** For [UniqueType.CreatesOneImprovement] */
-    ImprovementName("improvementName", "Trading Post", "The name of any improvement") {
+    ImprovementName("improvementName", "Trading Post", "The name of any improvement"){
         override fun getErrorSeverity(parameterText: String, ruleset: Ruleset):
                 UniqueType.UniqueParameterErrorSeverity? {
             if (parameterText == Constants.cancelImprovementOrder)

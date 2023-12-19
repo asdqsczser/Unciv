@@ -49,14 +49,13 @@ object TileSetCache : HashMap<String, TileSet>() {
         clear()
 
         // Load internal TileSets
-        val internalFiles: List<FileHandle> =
+        val internalFiles: Sequence<FileHandle> =
             if (consoleMode)
-                FileHandle("jsons/TileSets").list().toList()
+                FileHandle("jsons/TileSets").list().asSequence()
             else
                 ImageGetter.getAvailableTilesets()
                 .map { Gdx.files.internal("jsons/TileSets/$it.json") }
                 .filter { it.exists() }
-                .toList()
 
         loadConfigFiles(internalFiles, TileSet.DEFAULT)
 
@@ -69,7 +68,7 @@ object TileSetCache : HashMap<String, TileSet>() {
             val modName = modFolder.name()
             if (!modFolder.isDirectory || modName.startsWith('.'))
                 continue
-            val modFiles = modFolder.child("jsons/TileSets").list().toList()
+            val modFiles = modFolder.child("jsons/TileSets").list().asSequence()
             loadConfigFiles(modFiles, modName)
         }
 
@@ -78,7 +77,7 @@ object TileSetCache : HashMap<String, TileSet>() {
         assembleTileSetConfigs(hashSetOf()) // no game is loaded, this is just the initial game setup
     }
 
-    private fun loadConfigFiles(files: List<FileHandle>, configId: String) {
+    private fun loadConfigFiles(files: Sequence<FileHandle>, configId: String) {
         for (configFile in files) {
             // jsons/TileSets shouldn't have subfolders, but if a mad modder has one, don't crash (file.readString would throw):
             if (configFile.isDirectory) continue

@@ -1,7 +1,6 @@
 package com.unciv.ui.screens.worldscreen.mainmenu
 
 import com.unciv.ui.components.input.KeyboardBinding
-import com.unciv.ui.components.input.onLongPress
 import com.unciv.ui.popups.Popup
 import com.unciv.ui.screens.civilopediascreen.CivilopediaScreen
 import com.unciv.ui.screens.savescreens.LoadGameScreen
@@ -36,15 +35,10 @@ class WorldScreenMenuPopup(val worldScreen: WorldScreen) : Popup(worldScreen, sc
             close()
             worldScreen.game.pushScreen(VictoryScreen(worldScreen))
         }.row()
-        val optionsCell = addButton("Options", KeyboardBinding.Options) {
+        addButton("Options", KeyboardBinding.Options) {
             close()
             worldScreen.openOptionsPopup()
-        }
-        optionsCell.actor.onLongPress {
-            close()
-            worldScreen.openOptionsPopup(withDebug = true)
-        }
-        optionsCell.row()
+        }.row()
         addButton("Community") {
             close()
             WorldScreenCommunityPopup(worldScreen).open(force = true)

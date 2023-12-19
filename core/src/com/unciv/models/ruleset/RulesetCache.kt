@@ -11,6 +11,10 @@ import com.unciv.models.ruleset.validation.RulesetErrorList
 import com.unciv.models.ruleset.validation.RulesetErrorSeverity
 import com.unciv.utils.Log
 import com.unciv.utils.debug
+import com.unciv.logic.files.UncivFiles
+
+
+
 
 /** Loading mods is expensive, so let's only do it once and
  * save all of the loaded rulesets somewhere for later use
@@ -24,9 +28,9 @@ object RulesetCache : HashMap<String, Ruleset>() {
     /** Returns error lines from loading the rulesets, so we can display the errors to users */
     fun loadRulesets(consoleMode: Boolean = false, noMods: Boolean = false) :List<String> {
         val newRulesets = HashMap<String, Ruleset>()
-
         for (ruleset in BaseRuleset.values()) {
-            val fileName = "jsons/${ruleset.fullName}"
+//             val fileName = "../../android/assets/jsons/Civ V - Gods & Kings"
+            val fileName ="jsons/${ruleset.fullName}"
             val fileHandle =
                 if (consoleMode) FileHandle(fileName)
                 else Gdx.files.internal(fileName)
@@ -40,7 +44,7 @@ object RulesetCache : HashMap<String, Ruleset>() {
         val errorLines = ArrayList<String>()
         if (!noMods) {
             val modsHandles = if (consoleMode) FileHandle("mods").list()
-                else Gdx.files.local("mods").list()
+            else Gdx.files.local("mods").list()
 
             for (modFolder in modsHandles) {
                 if (modFolder.name().startsWith('.')) continue
@@ -121,11 +125,11 @@ object RulesetCache : HashMap<String, Ruleset>() {
      * Any mods in the [mods] parameter marked as base ruleset (or not loaded in [RulesetCache]) are ignored.
      */
     fun getComplexRuleset(mods: LinkedHashSet<String>, optionalBaseRuleset: String? = null): Ruleset {
-        val baseRuleset =
-                if (containsKey(optionalBaseRuleset) && this[optionalBaseRuleset]!!.modOptions.isBaseRuleset)
-                    this[optionalBaseRuleset]!!
-                else getVanillaRuleset()
 
+        val baseRuleset =
+            if (containsKey(optionalBaseRuleset))
+                this[optionalBaseRuleset]!!
+            else getVanillaRuleset()
         val loadedMods = mods.asSequence()
             .filter { containsKey(it) }
             .map { this[it]!! }
@@ -138,21 +142,27 @@ object RulesetCache : HashMap<String, Ruleset>() {
      * Creates a combined [Ruleset] from [baseRuleset] and [extensionRulesets] which must only contain non-base rulesets.
      */
     fun getComplexRuleset(baseRuleset: Ruleset, extensionRulesets: Iterable<Ruleset>): Ruleset {
+
         val newRuleset = Ruleset()
-
+//         println(1)
         val loadedMods = extensionRulesets.asSequence() + baseRuleset
-
+//         println(1)
         for (mod in loadedMods.sortedByDescending { it.modOptions.isBaseRuleset }) {
+//             println(mod)
             if (mod.modOptions.isBaseRuleset) {
                 // This is so we don't keep using the base ruleset's uniques *by reference* and add to in ad infinitum
                 newRuleset.modOptions.uniques = ArrayList()
                 newRuleset.modOptions.isBaseRuleset = true
             }
+//             println(mod)
             newRuleset.add(mod)
             newRuleset.mods += mod.name
+            println(newRuleset.name)
         }
+//         println(newRuleset)
         newRuleset.updateBuildingCosts() // only after we've added all the mods can we calculate the building costs
-
+//         println(1)
+//         println(newRuleset)
         return newRuleset
     }
 

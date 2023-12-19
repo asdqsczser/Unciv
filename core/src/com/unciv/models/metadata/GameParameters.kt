@@ -6,7 +6,7 @@ import com.unciv.models.ruleset.Speed
 
 
 @Suppress("EnumEntryName")  // These merit unusual names
-enum class BaseRuleset(val fullName:String) {
+enum class BaseRuleset(val fullName:String){
     Civ_V_Vanilla("Civ V - Vanilla"),
     Civ_V_GnK("Civ V - Gods & Kings"),
 }
@@ -40,11 +40,11 @@ class GameParameters : IsPartOfGameInfoSerialization { // Default values are the
     var noStartBias = false
 
     var victoryTypes: ArrayList<String> = arrayListOf()
-    var startingEra = "Ancient era"
+    var startingEra = "Medieval era"
 
-    var isOnlineMultiplayer = false
+    var isOnlineMultiplayer = true
     var multiplayerServerUrl: String? = null
-    var anyoneCanSpectate = true
+    var anyoneCanSpectate = false
     var baseRuleset: String = BaseRuleset.Civ_V_GnK.fullName
     var mods = LinkedHashSet<String>()
 
@@ -88,31 +88,24 @@ class GameParameters : IsPartOfGameInfoSerialization { // Default values are the
 
     // For debugging and GameStarter console output
     override fun toString() = sequence {
-            yield("$difficulty $speed $startingEra")
-            yield("${players.count { it.playerType == PlayerType.Human }} ${PlayerType.Human}")
-            yield("${players.count { it.playerType == PlayerType.AI }} ${PlayerType.AI}")
-            if (randomNumberOfPlayers) yield("Random number of Players: $minNumberOfPlayers..$maxNumberOfPlayers")
-            if (randomNumberOfCityStates) yield("Random number of City-States: $minNumberOfCityStates..$maxNumberOfCityStates")
-            else yield("$numberOfCityStates CS")
-            if (isOnlineMultiplayer) yield("Online Multiplayer")
-            if (noBarbarians) yield("No barbs")
-            if (ragingBarbarians) yield("Raging barbs")
-            if (oneCityChallenge) yield("OCC")
-            if (!nuclearWeaponsEnabled) yield("No nukes")
-            if (godMode) yield("God mode")
-            yield("Enabled Victories: " + victoryTypes.joinToString())
-            yield(baseRuleset)
-            yield(if (mods.isEmpty()) "no mods" else mods.joinToString(",", "mods=(", ")", 6) )
-        }.joinToString(prefix = "(", postfix = ")")
+        yield("$difficulty $speed $startingEra")
+        yield("${players.count { it.playerType == PlayerType.Human }} ${PlayerType.Human}")
+        yield("${players.count { it.playerType == PlayerType.AI }} ${PlayerType.AI}")
+        if (randomNumberOfPlayers) yield("Random number of Players: $minNumberOfPlayers..$maxNumberOfPlayers")
+        if (randomNumberOfCityStates) yield("Random number of City-States: $minNumberOfCityStates..$maxNumberOfCityStates")
+        else yield("$numberOfCityStates CS")
+        if (isOnlineMultiplayer) yield("Online Multiplayer")
+        if (noBarbarians) yield("No barbs")
+        if (ragingBarbarians) yield("Raging barbs")
+        if (oneCityChallenge) yield("OCC")
+        if (!nuclearWeaponsEnabled) yield("No nukes")
+        if (godMode) yield("God mode")
+        yield("Enabled Victories: " + victoryTypes.joinToString())
+        yield(baseRuleset)
+        yield(if (mods.isEmpty()) "no mods" else mods.joinToString(",", "mods=(", ")", 6) )
+    }.joinToString(prefix = "(", postfix = ")")
 
-    /** Get all mods including base
-     *
-     *  The returned Set is ordered base first, then in the order they are stored in a save.
-     *  This creates a fresh instance, and the caller is allowed to mutate it.
-     */
-    fun getModsAndBaseRuleset() =
-        LinkedHashSet<String>(mods.size + 1).apply {
-            add(baseRuleset)
-            addAll(mods)
-        }
+    fun getModsAndBaseRuleset(): HashSet<String> {
+        return mods.toHashSet().apply { add(baseRuleset) }
+    }
 }

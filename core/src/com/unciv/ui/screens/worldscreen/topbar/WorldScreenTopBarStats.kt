@@ -2,6 +2,7 @@ package com.unciv.ui.screens.worldscreen.topbar
 
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.unciv.logic.civilization.Civilization
 import com.unciv.models.stats.Stats
 import com.unciv.models.translations.tr
@@ -10,7 +11,6 @@ import com.unciv.ui.components.extensions.setFontColor
 import com.unciv.ui.components.extensions.toLabel
 import com.unciv.ui.components.extensions.toStringSigned
 import com.unciv.ui.components.input.onClick
-import com.unciv.ui.components.widgets.ScalingTableWrapper
 import com.unciv.ui.images.ImageGetter
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
@@ -20,7 +20,7 @@ import com.unciv.ui.screens.pickerscreens.TechPickerScreen
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableWrapper() {
+internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : Table() {
     private val goldLabel = "0".toLabel(colorFromRGB(225, 217, 71))
     private val scienceLabel = "0".toLabel(colorFromRGB(78, 140, 151))
     private val happinessLabel = "0".toLabel()
@@ -48,8 +48,6 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
     }
 
     init {
-        isTransform = false
-
 
         fun addStat(label: Label, icon: String, isLast: Boolean = false, screenFactory: ()-> BaseScreen) {
             val image = ImageGetter.getStatIcon(icon)
@@ -85,13 +83,14 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
         } else {
             add("Religion: Off".toLabel())
         }
-    }
 
+        //saveDimensions()
+    }
 
     private fun rateLabel(value: Float) = value.roundToInt().toStringSigned()
 
     fun update(civInfo: Civilization) {
-        resetScale()
+        //resetChildrenSizes()
 
         val nextTurnStats = civInfo.stats.statsForNextTurn
         val goldPerTurn = " (" + rateLabel(nextTurnStats.gold) + ")"
@@ -114,8 +113,8 @@ internal class WorldScreenTopBarStats(topbar: WorldScreenTopBar) : ScalingTableW
         cultureLabel.setText(getCultureText(civInfo, nextTurnStats))
         faithLabel.setText(civInfo.religionManager.storedFaith.toString() +
             " (" + rateLabel(nextTurnStats.faith) + ")")
-
-        scaleTo(worldScreen.stage.width)
+        //scaleToMaxWidth(worldScreen.stage.width)
+        pack()
     }
 
     private fun getCultureText(civInfo: Civilization, nextTurnStats: Stats): String {

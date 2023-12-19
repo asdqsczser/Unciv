@@ -350,7 +350,9 @@ object GameStarter {
         for (player in chosenPlayers) {
             val civ = Civilization(player.chosenCiv)
             when (player.chosenCiv) {
-                in usedMajorCivs, Constants.spectator -> {
+                Constants.spectator ->
+                    civ.playerType = player.playerType
+                in usedMajorCivs -> {
                     civ.playerType = player.playerType
                     civ.playerId = player.playerId
                 }

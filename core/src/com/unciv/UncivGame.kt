@@ -11,8 +11,10 @@ import com.badlogic.gdx.utils.Align
 import com.unciv.logic.GameInfo
 import com.unciv.logic.IsPartOfGameInfoSerialization
 import com.unciv.logic.UncivShowableException
+import com.unciv.logic.civilization.AlertType
 import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.civilization.PlayerType
+import com.unciv.logic.civilization.PopupAlert
 import com.unciv.logic.files.UncivFiles
 import com.unciv.logic.multiplayer.OnlineMultiplayer
 import com.unciv.models.metadata.GameSettings
@@ -37,6 +39,7 @@ import com.unciv.ui.screens.LoadingScreen
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.mainmenuscreen.MainMenuScreen
 import com.unciv.ui.screens.savescreens.LoadGameScreen
+import com.unciv.ui.screens.worldscreen.AlertPopup
 import com.unciv.ui.screens.worldscreen.PlayerReadyScreen
 import com.unciv.ui.screens.worldscreen.UndoHandler.Companion.clearUndoCheckpoints
 import com.unciv.ui.screens.worldscreen.WorldMapHolder
@@ -143,7 +146,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
     var worldScreen: WorldScreen? = null
         private set
-
+    var isstart :Boolean =false
     /** Flag used only during initialization until the end of [create] */
     protected var isInitialized = false
         private set
@@ -256,11 +259,13 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
     suspend fun loadGame(newGameInfo: GameInfo, callFromLoadScreen: Boolean = false): WorldScreen = withThreadPoolContext toplevel@{
         val prevGameInfo = gameInfo
         gameInfo = newGameInfo
-
-
+        if(!isstart&&settings.tutorialsShown.contains("Introduction")){
+            settings.tutorialsShown.remove("Introduction")
+            isstart=true
+        }
         if (gameInfo?.gameParameters?.isOnlineMultiplayer == true
-                && gameInfo?.gameParameters?.anyoneCanSpectate == false
-                && gameInfo!!.civilizations.none { it.playerId == settings.multiplayer.userId }) {
+            && gameInfo?.gameParameters?.anyoneCanSpectate == false
+            && gameInfo!!.civilizations.none { it.playerId == settings.multiplayer.userId }) {
             throw UncivShowableException("You are not allowed to spectate!")
         }
 
@@ -305,8 +310,8 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
     /** The new game info may have different mods or rulesets, which may use different resources that need to be loaded. */
     private suspend fun initializeResources(prevGameInfo: GameInfo?, newGameInfo: GameInfo) {
         if (prevGameInfo == null
-                || prevGameInfo.gameParameters.baseRuleset != newGameInfo.gameParameters.baseRuleset
-                || prevGameInfo.gameParameters.mods != newGameInfo.gameParameters.mods) {
+            || prevGameInfo.gameParameters.baseRuleset != newGameInfo.gameParameters.baseRuleset
+            || prevGameInfo.gameParameters.mods != newGameInfo.gameParameters.mods) {
             withGLContext {
                 ImageGetter.setNewRuleset(newGameInfo.ruleset)
             }
@@ -320,7 +325,6 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
         val curWorldScreen = worldScreen
         val curGameInfo = gameInfo
         if (curWorldScreen == null || curGameInfo == null) return
-
         loadGame(curGameInfo)
     }
 
@@ -544,7 +548,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
     companion object {
         //region AUTOMATICALLY GENERATED VERSION DATA - DO NOT CHANGE THIS REGION, INCLUDING THIS COMMENT
-        val VERSION = Version("4.8.18", 928)
+        val VERSION = Version("4.8.17", 927)
         //endregion
 
         lateinit var Current: UncivGame
