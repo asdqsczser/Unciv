@@ -11,6 +11,7 @@ import com.unciv.ui.components.fonts.FontFamilyData
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.KeyboardBindings
 import com.unciv.ui.screens.overviewscreen.EmpireOverviewCategories
+import com.unciv.utils.DebugUtils
 import com.unciv.utils.Display
 import com.unciv.utils.ScreenOrientation
 import java.text.Collator
@@ -160,10 +161,15 @@ class GameSettings {
     fun addCompletedTutorialTask(tutorialTask: String): Boolean {
         if (!tutorialTasksCompleted.add(tutorialTask)) return false
         UncivGame.Current.isTutorialTaskCollapsed = false
-        save()
+        if (DebugUtils.SIMULATEING==false)save()
         return true
     }
-
+    fun addCompletedTutorialTask_modify(tutorialTask: String): Boolean {
+        if (!tutorialTasksCompleted.add(tutorialTask)) return false
+        UncivGame.Current.isTutorialTaskCollapsed = false
+//         save()
+        return true
+    }
     fun updateLocaleFromLanguage() {
         val bannedCharacters = listOf(' ', '_', '-', '(', ')') // Things not to have in enum names
         val languageName = language.filterNot { it in bannedCharacters }
@@ -248,7 +254,7 @@ class GameSettingsMultiplayer {
     var turnCheckerDelay: Duration = Duration.ofMinutes(5)
     var statusButtonInSinglePlayer = false
     var currentGameRefreshDelay: Duration = Duration.ofSeconds(3)//10
-//     var allGameRefreshDelay: Duration = Duration.ofMinutes(5)
+    //     var allGameRefreshDelay: Duration = Duration.ofMinutes(5)
     var allGameRefreshDelay: Duration = Duration.ofSeconds(15)
     var currentGameTurnNotificationSound: UncivSound = UncivSound.Silent
     var otherGameTurnNotificationSound: UncivSound = UncivSound.Silent
@@ -266,7 +272,7 @@ enum class GameSetting(
     val kClass: KClass<*>,
     private val propertyGetter: (GameSettings) -> KMutableProperty0<*>
 ) {
-//     Uncomment these once they are refactored to send events on change
+    //     Uncomment these once they are refactored to send events on change
 //     MULTIPLAYER_USER_ID(String::class, { it.multiplayer::userId }),
 //     MULTIPLAYER_SERVER(String::class, { it.multiplayer::server }),
 //     MULTIPLAYER_STATUSBUTTON_IN_SINGLEPLAYER(Boolean::class, { it.multiplayer::statusButtonInSinglePlayer }),

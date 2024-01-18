@@ -424,8 +424,8 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         // whether our units can commit automated actions and then be attacked immediately etc.
 //         notifyOfCloseEnemyUnits(player)
     }
-    fun nextTenTurn(PreTurns:Int,Diplomacy_flag:Boolean,workerAuto:Boolean) {
-
+    fun nextTenTurn(PreTurns:Int,Diplomacy_flag:Boolean,workerAuto:Boolean,post:Boolean) {
+        DebugUtils.SIMULATEING=true
         DebugUtils.SIMULATE_UNTIL_TURN=PreTurns
         var player = currentPlayerCiv
         var playerIndex = civilizations.indexOf(player)
@@ -448,7 +448,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
             humanid=playerIndex
             player.playerType=PlayerType.AI
             flag=1
-//             TurnManager(player).endTurn(progressBar)
+            TurnManager(player).endTurn_modify()
             setNextPlayer()
         }
 
@@ -466,16 +466,16 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 flag++
             }
             // Starting preparations
-//             TurnManager(player).startTurn(progressBar)
+            TurnManager(player).startTurn_modify()
             // Automation done here
-            TurnManager(player).automateTurn_modify(Diplomacy_flag,workerAuto)
+            TurnManager(player).automateTurn_modify(Diplomacy_flag, workerAuto, post)
             // Do we need to break if player won?
             if (simulateUntilWin && player.victoryManager.hasWon()) {
                 simulateUntilWin = false
                 break
             }
             // Clean up
-//             TurnManager(player).endTurn(progressBar)
+            TurnManager(player).endTurn_modify()
             // To the next player
             setNextPlayer()
         }
@@ -491,7 +491,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         currentPlayerCiv = getCivilization(currentPlayer)
 
         // Starting his turn
-//         TurnManager(player).startTurn(progressBar)
+        TurnManager(player).startTurn_modify()
 
         // No popups for spectators
         if (currentPlayerCiv.isSpectator())
@@ -706,7 +706,6 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 diplomacyManager.updateHasOpenBorders()
             }
         }
-
         tileMap.setTransients(ruleset)
         if (currentPlayer == "") currentPlayer =
             if (gameParameters.isOnlineMultiplayer) civilizations.first { it.isHuman() && !it.isSpectator() }.civName // For MP, spectator doesn't get a 'turn'

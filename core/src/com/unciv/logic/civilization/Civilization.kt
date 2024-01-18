@@ -153,7 +153,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     val popupAlerts = ArrayList<PopupAlert>()
     private var allyCivName: String? = null
     var naturalWonders = ArrayList<String>()
-
+    var resourcehash = HashMap<String, Int>()
     /* AI section */
     val tacticalAI = TacticalAI()
 
@@ -165,7 +165,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     }
 
     /** for trades here, ourOffers is the current civ's offers, and theirOffers is what the requesting civ offers  */
-    val tradeRequests = ArrayList<TradeRequest>()
+    open val tradeRequests = ArrayList<TradeRequest>()
 
     /** See DiplomacyManager.flagsCountdown for why this does not map Enums to ints */
     var flagsCountdown = HashMap<String, Int>()
@@ -289,6 +289,7 @@ class Civilization : IsPartOfGameInfoSerialization {
         toReturn.hasMovedAutomatedUnits = hasMovedAutomatedUnits
         toReturn.statsHistory = statsHistory.clone()
         toReturn.resourceStockpiles = resourceStockpiles.clone()
+        toReturn.resourcehash = resourcehash
         return toReturn
     }
 
@@ -421,6 +422,7 @@ class Civilization : IsPartOfGameInfoSerialization {
                 hashMap[entry.resource.name] = entry.amount
         for ((key, value) in resourceStockpiles)
             hashMap[key] = value
+        resourcehash = hashMap
         return hashMap
     }
 
