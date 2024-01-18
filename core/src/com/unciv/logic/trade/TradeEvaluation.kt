@@ -218,7 +218,7 @@ class TradeEvaluation {
                     // Since it will be evaluated twice, once when they evaluate our offer and once when they evaluate theirs
                     Constants.peaceTreaty -> evaluatePeaceCostForThem(civInfo, tradePartner)
                     Constants.defensivePact -> if (DiplomacyAutomation.wantsToSignDefensivePact(civInfo, tradePartner)) 0
-                        else 100000
+                        else 1000
                     Constants.researchAgreement -> -offer.amount
                     else -> 1000
                     //Todo:AddDefensiveTreatyHere
