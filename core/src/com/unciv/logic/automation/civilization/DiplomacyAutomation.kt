@@ -1,7 +1,7 @@
 package com.unciv.logic.automation.civilization
 
 import com.unciv.Constants
-import com.unciv.ContentData
+// import com.unciv.ContentData
 import com.unciv.json.json
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.automation.ThreatLevel
