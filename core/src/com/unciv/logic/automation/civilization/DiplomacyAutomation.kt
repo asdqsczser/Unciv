@@ -1,7 +1,7 @@
 package com.unciv.logic.automation.civilization
 
 import com.unciv.Constants
-import com.unciv.ContentData
+// import com.unciv.ContentData
 import com.unciv.json.json
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.automation.ThreatLevel
@@ -279,7 +279,7 @@ object DiplomacyAutomation {
         }
         // Don't accept if they are at war with our friends, they might use our land to attack them
         if (civInfo.diplomacy.values.any { it.isRelationshipLevelGE(RelationshipLevel.Friend) && it.otherCiv().isAtWarWith(otherCiv)}){
-            Reason_reject.add("Don't accept if they are at war with our friends, they might use our land to attack them")
+            Reason_reject.add("Don't accept if you are at war with our friends, you might use our land to attack them")
             score-=50
             flag++
         }
@@ -499,7 +499,7 @@ object DiplomacyAutomation {
         }
         // If they have a defensive pact with another civ then we would get drawn into thier battles as well
         motivation -= 10 * otherCivNonOverlappingDefensivePacts
-        if(otherCivNonOverlappingDefensivePacts>0)Reason_reject.add("If they have a defensive pact with another civ then we would get drawn into thier battles as well")
+        if(otherCivNonOverlappingDefensivePacts>0)Reason_reject.add("If you have a defensive pact with another civ then we would get drawn into thier battles as well")
         // Try to have a defensive pact with 1/5 of all civs
         val civsToAllyWith = 0.20f * allAliveCivs
         // Goes form 0 to -50 as the civ gets more allies, offset by civsToAllyWith
@@ -803,13 +803,13 @@ object DiplomacyAutomation {
 
         if (theirCity.getTiles().none { tile -> tile.neighbors.any { it.getOwner() == theirCity.civ && it.getCity() != theirCity } }){
             modifierMap["Isolated city"] = 15
-            Reason_consent.add("They were alone")
+            Reason_consent.add("You were alone")
         }
 
 
         if (otherCiv.isCityState()) {
             modifierMap["City-state"] = -20
-            Reason_reject.add("They're just city-states")
+            Reason_reject.add("You're just city-states")
             if (otherCiv.getAllyCiv() == civInfo.civName){
                 modifierMap["Allied City-state"] = -20 // There had better be a DAMN good reason
                 Reason_reject.add("It's a confederate city")
