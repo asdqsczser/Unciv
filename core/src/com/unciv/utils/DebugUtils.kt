@@ -7,7 +7,7 @@ object DebugUtils {
      * Remember to turn this to false before commit and upload!
      * Or use the "secret" debug page of the options popup instead.
      */
-    var VISIBLE_MAP: Boolean = true
+    var VISIBLE_MAP: Boolean = false
 
     /** This flag paints the tile coordinates directly onto the map tiles. */
     var SHOW_TILE_COORDS: Boolean = false
@@ -24,5 +24,7 @@ object DebugUtils {
     var SIMULATEING: Boolean = false
 
     var NEED_POST: Boolean = false
+
+    var Active_Diplomacy:Boolean = false
 
 }
