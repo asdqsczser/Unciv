@@ -134,7 +134,7 @@ object CivilianUnitAutomation {
 
         return // The AI doesn't know how to handle unknown civilian units
     }
-    fun automateCivilianUnit_civsim(unit: MapUnit,workerAuto:Boolean) {
+    fun automateCivilianUnit_civsim(unit: MapUnit, workerAuto:Boolean) {
 
         if (unit.NumOfWokerUse >=3 && unit.wokeruseing <= 1 ){
             unit.destroy()

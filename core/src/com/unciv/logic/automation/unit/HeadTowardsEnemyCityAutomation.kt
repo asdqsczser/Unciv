@@ -1,35 +1,30 @@
 package com.unciv.logic.automation.unit
 
-import com.unciv.logic.automation.civilization.ContentData_three
-import com.unciv.logic.automation.civilization.ContentData_two
-import com.unciv.logic.automation.civilization.ContentData_unit
+import com.unciv.logic.automation.civilization.ContentDataUnit
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.automation.civilization.sendPostRequest
 import com.unciv.logic.battle.BattleDamage
 import com.unciv.logic.battle.CityCombatant
 import com.unciv.logic.battle.MapUnitCombatant
 import com.unciv.logic.city.City
-import com.unciv.logic.civilization.Civilization
 import com.unciv.logic.files.UncivFiles
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.mapunit.movement.PathsToTilesWithinTurn
 import com.unciv.logic.map.tile.Tile
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.JsonPrimitive
+
 object HeadTowardsEnemyCityAutomation {
 
     /** @returns whether the unit has taken this action */
     /**
      * 尝试去敌人城市，只专注打一个敌人
      */
-    fun tryHeadTowardsEnemyCity_civsim(unit: MapUnit,id:Int): Boolean {
+    fun tryHeadTowardsEnemyCity_civsim(unit: MapUnit, id:Int): Boolean {
         if (unit.civ.cities.isEmpty()) return false
 
         val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
-        val contentData = ContentData_unit(content, unit.civ.civName,id.toString())
+        val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
         val jsonString = Json.encodeToString(contentData)
         val postRequestResult= sendPostRequest("http://127.0.0.1:2337/getEnemyCitiesByPriority",jsonString)
 //         val jsonObject = Json.parseToJsonElement(postRequestResult)
@@ -39,7 +34,7 @@ object HeadTowardsEnemyCityAutomation {
 //         } else {
 //             null // 处理 "result" 不是字符串或字段不存在的情况
 //         }
-        if (postRequestResult ==null||postRequestResult=="None" )return false
+        if (postRequestResult=="None") return false
         val (x, y) = postRequestResult.split(",").map { it.toInt() }
 //         var flag = false
 //         var closestReachableEnemyCity = City()
@@ -83,7 +78,7 @@ object HeadTowardsEnemyCityAutomation {
         if (city != null) {
             val x = city.getCenterTile().position.x
             val y= city.getCenterTile().position.y
-            return "x,y"
+            return "$x,$y"
         }
         return "None"
     }

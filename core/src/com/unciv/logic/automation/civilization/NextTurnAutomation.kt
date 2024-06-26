@@ -94,7 +94,7 @@ object NextTurnAutomation {
         tryVoteForDiplomaticVictory(civInfo)
     }
 
-    fun automateCivMoves_civsim(civInfo: Civilization,Diplomacy_flag: Boolean,workerAuto:Boolean,post: Boolean) {
+    fun automateCivMoves_civsim(civInfo: Civilization, Diplomacy_flag: Boolean, workerAuto:Boolean, post: Boolean) {
         if (civInfo.isBarbarian()) return BarbarianAutomation(civInfo).automate()
 
         respondToPopupAlerts(civInfo)
@@ -132,7 +132,7 @@ object NextTurnAutomation {
             protectCityStates(civInfo)
             bullyCityStates(civInfo)
         }
-        automateUnits_civsim(civInfo,workerAuto,post)  // this is the most expensive part
+        automateUnits_civsim(civInfo, workerAuto, post)  // this is the most expensive part
 
         if (civInfo.isMajorCiv() && civInfo.gameInfo.isReligionEnabled()) {
             // Can only be done now, as the prophet first has to decide to found/enhance a religion
@@ -162,9 +162,9 @@ object NextTurnAutomation {
         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
         ///该回合请求使用哪几种技能
         if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-            val contentData = ContentData_two(content, civInfo.civName)
+            val contentData = ContentDataV2(content, civInfo.civName)
             val jsonString = Json.encodeToString(contentData)
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/use_tools", jsonString)
+            sendPostRequest("http://127.0.0.1:2337/use_tools", jsonString)
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -181,11 +181,11 @@ object NextTurnAutomation {
                 var jsonString: String
                 if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
                     if (DebugUtils.NEED_GameInfo) {
-                        val contentData = ContentData_four(content, civInfo.civName, requestingCiv.civName,"Friendship")
+                        val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
                         jsonString = Json.encodeToString(contentData)
                     } else {
                         val contentData =
-                            ContentData_three(content, civInfo.civName, requestingCiv.civName)
+                            ContentDataV3(content, civInfo.civName, requestingCiv.civName)
                         jsonString = Json.encodeToString(contentData)
                     }
 //                     val contentData =
@@ -351,14 +351,14 @@ object NextTurnAutomation {
             return researchableTechs.toSortedMap().values.toList()
         }
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING){
-            var jsonString: String
+            val jsonString: String
             if (DebugUtils.NEED_GameInfo){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
-                var contentData = ContentData_four(content, civInfo.civName,civInfo.civName,"choose_technology")
+                val contentData = ContentDataV4(content, civInfo.civName,civInfo.civName,"choose_technology")
                 jsonString = Json.encodeToString(contentData)
             }
             else{
-                var contentData = ContentData_three("choose_technology", civInfo.civName,civInfo.civName)
+                val contentData = ContentDataV3("choose_technology", civInfo.civName,civInfo.civName)
                 jsonString = Json.encodeToString(contentData)
             }
             val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
@@ -542,9 +542,9 @@ object NextTurnAutomation {
     }
 
 
-    private fun automateUnits(civInfo: Civilization,post: Boolean) {
+    private fun automateUnits(civInfo: Civilization, post: Boolean) {
 //         sortedBy { unit -> getUnitPriority(unit, isAtWar) }
-        val isAtWar = civInfo.isAtWar()
+//         val isAtWar = civInfo.isAtWar()
         val sortedUnits = civInfo.units.getCivUnits()
         var id = 1
         for (unit in sortedUnits) {
@@ -553,24 +553,24 @@ object NextTurnAutomation {
         }
     }
     fun getunits(civInfo: Civilization,id:Int):MapUnit?{
-        val isAtWar = civInfo.isAtWar()
+//         val isAtWar = civInfo.isAtWar()
         val sortedUnits = civInfo.units.getCivUnits()
         var count=1
         for (unit in sortedUnits) {
             if (count==id) return unit
             count++
         }
-        var mapUnit = MapUnit()
+        val mapUnit = MapUnit()
         mapUnit.instanceName="None"
         return mapUnit
     }
 
-    private fun automateUnits_civsim(civInfo: Civilization,workerAuto:Boolean,post: Boolean){
-        val isAtWar = civInfo.isAtWar()
+    private fun automateUnits_civsim(civInfo: Civilization, workerAuto:Boolean, post: Boolean){
+//         val isAtWar = civInfo.isAtWar()
         val sortedUnits = civInfo.units.getCivUnits()
         var id = 1
         for (unit in sortedUnits) {
-            UnitAutomation.automateUnitMoves_civsim(unit, id, workerAuto,post)
+            UnitAutomation.automateUnitMoves_civsim(unit, id, workerAuto, post)
             id++
         }
     }

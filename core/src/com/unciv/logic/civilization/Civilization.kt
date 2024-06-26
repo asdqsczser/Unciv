@@ -130,7 +130,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     @Transient
     var neutralRoads = HashSet<Vector2>()
 
-    open var playerType = PlayerType.AI
+    var playerType = PlayerType.AI
 
     /** Used in online multiplayer for human players */
     var playerId = ""
@@ -167,7 +167,7 @@ class Civilization : IsPartOfGameInfoSerialization {
     }
 
     /** for trades here, ourOffers is the current civ's offers, and theirOffers is what the requesting civ offers  */
-    open val tradeRequests = ArrayList<TradeRequest>()
+    val tradeRequests = ArrayList<TradeRequest>()
 
     /** See DiplomacyManager.flagsCountdown for why this does not map Enums to ints */
     var flagsCountdown = HashMap<String, Int>()
@@ -326,8 +326,8 @@ class Civilization : IsPartOfGameInfoSerialization {
 
     fun getCapital(firstCityIfNoCapital: Boolean = false) = cities.firstOrNull { it.isCapital() } ?:
     if (firstCityIfNoCapital) cities.firstOrNull() else null
-    open fun isHuman() = playerType == PlayerType.Human
-    open fun isAI() = playerType == PlayerType.AI
+    fun isHuman() = playerType == PlayerType.Human
+    fun isAI() = playerType == PlayerType.AI
     fun isOneCityChallenger() = playerType == PlayerType.Human && gameInfo.gameParameters.oneCityChallenge
 
     fun isCurrentPlayer() = gameInfo.currentPlayerCiv == this

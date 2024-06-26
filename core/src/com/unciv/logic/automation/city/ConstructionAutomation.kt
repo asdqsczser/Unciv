@@ -2,9 +2,8 @@ package com.unciv.logic.automation.city
 
 import com.unciv.GUI
 import com.unciv.logic.automation.Automation
-import com.unciv.logic.automation.civilization.ContentData_four
-import com.unciv.logic.automation.civilization.ContentData_three
-import com.unciv.logic.automation.civilization.ContentData_two
+import com.unciv.logic.automation.civilization.ContentDataV4
+import com.unciv.logic.automation.civilization.ContentDataV3
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.automation.civilization.sendPostRequest
 import com.unciv.logic.city.CityConstructions
@@ -94,18 +93,18 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
 
     fun chooseNextConstruction() {
         if (cityConstructions.getCurrentConstruction() !is PerpetualConstruction) return  // don't want to be stuck on these forever
-        var chosenConstruction: String = ""
+        var chosenConstruction = ""
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING) {
-            var jsonString: String
+            val jsonString: String
             if (DebugUtils.NEED_GameInfo){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                 val contentData =
-                    ContentData_four(content,civInfo.civName, city.name,"production_priority")
+                    ContentDataV4(content,civInfo.civName, city.name,"production_priority")
                 jsonString = Json.encodeToString(contentData)
             }
             else {
                 val contentData =
-                    ContentData_three("production_priority", civInfo.civName, city.name)
+                    ContentDataV3("production_priority", civInfo.civName, city.name)
                 jsonString = Json.encodeToString(contentData)
             }
             val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
@@ -161,7 +160,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
                 else relativeCostEffectiveness.minByOrNull { it.remainingWork }!!.choice
         }
 
-        var isMiliy = city.getRuleset().units.values.asSequence()
+        val isMiliy = city.getRuleset().units.values.asSequence()
                 .filter { it.name == chosenConstruction }
         if (isMiliy.firstOrNull()?.isMilitary() == true) city.population.addPopulation(-1)
 

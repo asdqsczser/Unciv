@@ -467,14 +467,14 @@ class TurnManager(val civInfo: Civilization) {
         if (civInfo.isBarbarian() && !civInfo.gameInfo.gameParameters.noBarbarians)
             civInfo.gameInfo.barbarians.updateEncampments()
     }
-    fun automateTurn_civsim(Diplomacy_flag : Boolean,workerAuto:Boolean,post:Boolean) {
+    fun automateTurn_civsim(diplomacyFlag:Boolean, workerAuto:Boolean, post:Boolean) {
         // Defeated civs do nothing
         if (civInfo.isDefeated())
             return
 
         // Do stuff
 //         NextTurnAutomation.automateCivMoves(civInfo)
-        NextTurnAutomation.automateCivMoves_civsim(civInfo,Diplomacy_flag,workerAuto,post)
+        NextTurnAutomation.automateCivMoves_civsim(civInfo, diplomacyFlag, workerAuto, post)
         // Update barbarian camps
         if (civInfo.isBarbarian() && !civInfo.gameInfo.gameParameters.noBarbarians)
             civInfo.gameInfo.barbarians.updateEncampments()

@@ -45,11 +45,11 @@ object TradeAutomation {
             if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
                 var jsonString: String
                 if(DebugUtils.NEED_GameInfo){
-                    var contentData = ContentData_four(content, civInfo.civName,otherCiv.civName,"trade")
+                    val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentData_three(content, civInfo.civName, otherCiv.civName)
+                    val contentData = ContentDataV3(content, civInfo.civName, otherCiv.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
                 val postRequestResult = sendPostRequest("http://127.0.0.1:2337/Decision", jsonString)
@@ -210,9 +210,9 @@ object TradeAutomation {
 
      fun proposeCommonEnemy(civInfo: Civilization){
 //          val tradeLogic = TradeLogic(civInfo, otherCivInfo)
-         var jsonString: String
+         val jsonString: String
          if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-             val contentData = ContentData_three("common_enemy", civInfo.civName,civInfo.civName)
+             val contentData = ContentDataV3("common_enemy", civInfo.civName,civInfo.civName)
              jsonString = Json.encodeToString(contentData)
              val postRequestResult =
                  sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
@@ -228,20 +228,20 @@ object TradeAutomation {
                  val tocivElement = jsonObject.jsonObject["to_civ"]?.jsonPrimitive?.content
                  val enemycivElement = jsonObject.jsonObject["enemy_civ"]?.jsonPrimitive?.content
                  val trade = Trade()
-                 var otherCiv = civInfo.gameInfo.getCivilization(tocivElement!!)
-                 var enemyCiv = civInfo.gameInfo.getCivilization(enemycivElement!!)
+                 val otherCiv = civInfo.gameInfo.getCivilization(tocivElement!!)
+                 val enemyCiv = civInfo.gameInfo.getCivilization(enemycivElement!!)
                  //如果已经在交战中则不需要再次宣战
                  if (civInfo.isAtWarWith(enemyCiv)) {
-                     var theiroffer =
-                         TradeOffer(name = enemycivElement!!, type = TradeType.WarDeclaration)
+                     val theiroffer =
+                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
                      trade.theirOffers.add(theiroffer)
                      val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
                      otherCiv.tradeRequests.add(tradeRequest)
                  } else {
-                     var ouroffer =
-                         TradeOffer(name = enemycivElement!!, type = TradeType.WarDeclaration)
-                     var theiroffer =
-                         TradeOffer(name = enemycivElement!!, type = TradeType.WarDeclaration)
+                     val ouroffer =
+                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
+                     val theiroffer =
+                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
                      trade.ourOffers.add(ouroffer)
                      trade.theirOffers.add(theiroffer)
                      val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
@@ -281,7 +281,7 @@ object TradeAutomation {
     private fun potentialLuxuryTrades(civInfo: Civilization, otherCivInfo: Civilization): ArrayList<Trade> {
         val tradeLogic = TradeLogic(civInfo, otherCivInfo)
         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-            val contentData = ContentData_three("buy_luxury", civInfo.civName,otherCivInfo.civName)
+            val contentData = ContentDataV3("buy_luxury", civInfo.civName,otherCivInfo.civName)
             val jsonString = Json.encodeToString(contentData)
             val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
