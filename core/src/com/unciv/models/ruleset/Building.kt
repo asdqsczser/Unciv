@@ -44,7 +44,7 @@ class Building : RulesetStatsObject(), INonPerpetualConstruction {
     var requiredBuilding: String? = null
 
     /** A strategic resource that will be consumed by this building */
-    var requiredResource: String? = null
+    private var requiredResource: String? = null
 
     /** City can only be built if one of these resources is nearby - it must be improved! */
     var requiredNearbyImprovedResources: List<String>? = null
@@ -54,7 +54,7 @@ class Building : RulesetStatsObject(), INonPerpetualConstruction {
     var uniqueTo: String? = null
     var quote: String = ""
     override fun getUniqueTarget() = if (isAnyWonder()) UniqueTarget.Wonder else UniqueTarget.Building
-    var replacementTextForUniques = ""
+    private var replacementTextForUniques = ""
 
     /** Used for AlertType.WonderBuilt, and as sub-text in Nation and Tech descriptions */
     fun getShortDescription(multiline:Boolean = false): String {

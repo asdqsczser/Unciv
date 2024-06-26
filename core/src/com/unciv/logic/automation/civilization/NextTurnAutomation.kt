@@ -13,6 +13,7 @@ import com.unciv.logic.civilization.diplomacy.DiplomacyFlags
 import com.unciv.logic.civilization.diplomacy.DiplomaticModifiers
 import com.unciv.logic.civilization.diplomacy.DiplomaticStatus
 import com.unciv.logic.civilization.diplomacy.RelationshipLevel
+import com.unciv.logic.files.UncivFiles
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.models.ruleset.MilestoneType
 import com.unciv.models.ruleset.ModOptionsConstants
@@ -27,6 +28,11 @@ import com.unciv.models.ruleset.unit.BaseUnit
 import com.unciv.models.stats.Stat
 import com.unciv.ui.screens.victoryscreen.RankingType
 import com.unciv.utils.DebugUtils
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
 import kotlin.random.Random
 
 object NextTurnAutomation {
@@ -35,32 +41,38 @@ object NextTurnAutomation {
     fun automateCivMoves(civInfo: Civilization) {
         if (civInfo.isBarbarian()) return BarbarianAutomation(civInfo).automate()
 
-        respondToPopupAlerts(civInfo)
-        TradeAutomation.respondToTradeRequests(civInfo)//
+        if (civInfo.gameInfo.turns % 5 == 0 || civInfo.gameInfo.turns % 5 == 1) {
 
-        if (civInfo.isMajorCiv()) {
-            if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
-                if (DebugUtils.Active_Diplomacy) {
-                    DiplomacyAutomation.declareWar(civInfo)
-                    DiplomacyAutomation.offerPeaceTreaty(civInfo)
-                    DiplomacyAutomation.offerDeclarationOfFriendship(civInfo)
+            respondToPopupAlerts(civInfo)
+            TradeAutomation.respondToTradeRequests(civInfo)//
+        }
+        if (civInfo.gameInfo.turns % 5 == 0){
+            if (civInfo.isMajorCiv()) {
+                if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
+                    if (DebugUtils.Active_Diplomacy) {
+                        DiplomacyAutomation.declareWar(civInfo)
+                        DiplomacyAutomation.offerPeaceTreaty(civInfo)
+                        DiplomacyAutomation.offerDeclarationOfFriendship(civInfo)
+                    }
                 }
+                if (civInfo.gameInfo.isReligionEnabled()) {
+                    ReligionAutomation.spendFaithOnReligion(civInfo)//
+                }
+                if (DebugUtils.Active_Diplomacy) {
+                    DiplomacyAutomation.offerOpenBorders(civInfo)
+                    DiplomacyAutomation.offerResearchAgreement(civInfo)
+                    DiplomacyAutomation.offerDefensivePact(civInfo)
+                }
+                TradeAutomation.exchangeLuxuries(civInfo)
+                TradeAutomation.proposeCommonEnemy(civInfo)
+                issueRequests(civInfo)
+                adoptPolicy(civInfo)  // todo can take a second - why?
+                freeUpSpaceResources(civInfo)
+            } else {
+                civInfo.cityStateFunctions.getFreeTechForCityState()
+                civInfo.cityStateFunctions.updateDiplomaticRelationshipForCityState()
             }
-            if (civInfo.gameInfo.isReligionEnabled()) {
-                ReligionAutomation.spendFaithOnReligion(civInfo)//
-            }
-            if (DebugUtils.Active_Diplomacy) {
-                DiplomacyAutomation.offerOpenBorders(civInfo)
-                DiplomacyAutomation.offerResearchAgreement(civInfo)
-                DiplomacyAutomation.offerDefensivePact(civInfo)
-            }
-            TradeAutomation.exchangeLuxuries(civInfo)
-            issueRequests(civInfo)
-            adoptPolicy(civInfo)  // todo can take a second - why?
-            freeUpSpaceResources(civInfo)
-        } else {
-            civInfo.cityStateFunctions.getFreeTechForCityState()
-            civInfo.cityStateFunctions.updateDiplomaticRelationshipForCityState()
+
         }
 
         chooseTechToResearch(civInfo)
@@ -82,7 +94,7 @@ object NextTurnAutomation {
         tryVoteForDiplomaticVictory(civInfo)
     }
 
-    fun automateCivMoves_modify(civInfo: Civilization,Diplomacy_flag: Boolean,workerAuto:Boolean,post: Boolean) {
+    fun automateCivMoves_civsim(civInfo: Civilization,Diplomacy_flag: Boolean,workerAuto:Boolean,post: Boolean) {
         if (civInfo.isBarbarian()) return BarbarianAutomation(civInfo).automate()
 
         respondToPopupAlerts(civInfo)
@@ -120,7 +132,7 @@ object NextTurnAutomation {
             protectCityStates(civInfo)
             bullyCityStates(civInfo)
         }
-        automateUnits_modify(civInfo,workerAuto,post)  // this is the most expensive part
+        automateUnits_civsim(civInfo,workerAuto,post)  // this is the most expensive part
 
         if (civInfo.isMajorCiv() && civInfo.gameInfo.isReligionEnabled()) {
             // Can only be done now, as the prophet first has to decide to found/enhance a religion
@@ -147,6 +159,14 @@ object NextTurnAutomation {
         }
     }
     private fun respondToPopupAlerts(civInfo: Civilization) {
+        val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
+        ///该回合请求使用哪几种技能
+        if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+            val contentData = ContentData_two(content, civInfo.civName)
+            val jsonString = Json.encodeToString(contentData)
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/use_tools", jsonString)
+        }
+        ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
             if (popupAlert.type == AlertType.DemandToStopSettlingCitiesNear) {  // we're called upon to make a decision
                 val demandingCiv = civInfo.gameInfo.getCivilization(popupAlert.value)
@@ -158,14 +178,66 @@ object NextTurnAutomation {
             if (popupAlert.type == AlertType.DeclarationOfFriendship) {
                 val requestingCiv = civInfo.gameInfo.getCivilization(popupAlert.value)
                 val diploManager = civInfo.getDiplomacyManager(requestingCiv)
-                if (civInfo.diplomacyFunctions.canSignDeclarationOfFriendshipWith(requestingCiv)
-                    && DiplomacyAutomation.wantsToSignDeclarationOfFrienship(civInfo,requestingCiv)) {
-                    diploManager.signDeclarationOfFriendship()
-                    requestingCiv.addNotification("We have signed a Declaration of Friendship with [${civInfo.civName}]!", NotificationCategory.Diplomacy, NotificationIcon.Diplomacy, civInfo.civName)
-                } else  {
-                    diploManager.otherCivDiplomacy().setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
-                    requestingCiv.addNotification("[${civInfo.civName}] has denied our Declaration of Friendship!", NotificationCategory.Diplomacy, NotificationIcon.Diplomacy, civInfo.civName)
+                var jsonString: String
+                if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+                    if (DebugUtils.NEED_GameInfo) {
+                        val contentData = ContentData_four(content, civInfo.civName, requestingCiv.civName,"Friendship")
+                        jsonString = Json.encodeToString(contentData)
+                    } else {
+                        val contentData =
+                            ContentData_three(content, civInfo.civName, requestingCiv.civName)
+                        jsonString = Json.encodeToString(contentData)
+                    }
+//                     val contentData =
+//                         ContentData_three(content, civInfo.civName, requestingCiv.civName)
+//                      jsonString = Json.encodeToString(contentData)
+                    val postRequestResult = sendPostRequest(
+                        "http://127.0.0.1:2337/wantsToDeclarationOfFrienship",
+                        jsonString
+                    )
+                    val jsonObject = Json.parseToJsonElement(postRequestResult)
+                    val resultElement = jsonObject.jsonObject["result"]
+                    val resultValue: Boolean? =
+                        if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                            if (resultElement.contentOrNull == "yes") {
+                                true
+                            } else {
+                                resultElement.contentOrNull!!.toBoolean()
+                            }
+                        } else {
+                            null // 处理 "result" 不是布尔值或字段不存在的情况
+                        }
+                    if (resultValue == true) {
+                        diploManager.signDeclarationOfFriendship()
+                        requestingCiv.addNotification(
+                            "We have signed a Declaration of Friendship with [${civInfo.civName}]!",
+                            NotificationCategory.Diplomacy,
+                            NotificationIcon.Diplomacy,
+                            civInfo.civName
+                        )
+                    } else {
+                        diploManager.otherCivDiplomacy()
+                            .setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
+                        requestingCiv.addNotification(
+                            "[${civInfo.civName}] has denied our Declaration of Friendship!",
+                            NotificationCategory.Diplomacy,
+                            NotificationIcon.Diplomacy,
+                            civInfo.civName
+                        )
+                    }
                 }
+                else{
+                    if (civInfo.diplomacyFunctions.canSignDeclarationOfFriendshipWith(requestingCiv)
+                        && DiplomacyAutomation.wantsToSignDeclarationOfFrienship(civInfo,requestingCiv)) {
+                        diploManager.signDeclarationOfFriendship()
+                        requestingCiv.addNotification("We have signed a Declaration of Friendship with [${civInfo.civName}]!", NotificationCategory.Diplomacy, NotificationIcon.Diplomacy, civInfo.civName)
+                    } else  {
+                        diploManager.otherCivDiplomacy().setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
+                        requestingCiv.addNotification("[${civInfo.civName}] has denied our Declaration of Friendship!", NotificationCategory.Diplomacy, NotificationIcon.Diplomacy, civInfo.civName)
+                    }
+                }
+
+
 
             }
         }
@@ -253,6 +325,23 @@ object NextTurnAutomation {
         }
     }
 
+    fun getAllProductionToBuild_available(civInfo:Civilization):String{
+        var AllProductionToBuild_available = ""
+        for (city in civInfo.cities) {
+            AllProductionToBuild_available +=city.name+" : "+ city.chooseNextConstructionAsString_civsim()+"\n"
+        }
+        return AllProductionToBuild_available
+    }
+    fun getGroupedResearchableTechsAsString(civInfo: Civilization): String {
+        val researchableTechs = civInfo.gameInfo.ruleset.technologies.values
+            .asSequence()
+            .filter { civInfo.tech.canBeResearched(it.name) }
+            .groupBy { it.cost }
+        val techLists = researchableTechs.toSortedMap().values.map { techList ->
+            techList.map { it.name }.joinToString(", ")
+        }
+        return techLists.joinToString("\n")
+    }
     private fun chooseTechToResearch(civInfo: Civilization) {
         fun getGroupedResearchableTechs(): List<List<Technology>> {
             val researchableTechs = civInfo.gameInfo.ruleset.technologies.values
@@ -261,16 +350,80 @@ object NextTurnAutomation {
                 .groupBy { it.cost }
             return researchableTechs.toSortedMap().values.toList()
         }
-        while(civInfo.tech.freeTechs > 0) {
+        if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING){
+            var jsonString: String
+            if (DebugUtils.NEED_GameInfo){
+                val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
+                var contentData = ContentData_four(content, civInfo.civName,civInfo.civName,"choose_technology")
+                jsonString = Json.encodeToString(contentData)
+            }
+            else{
+                var contentData = ContentData_three("choose_technology", civInfo.civName,civInfo.civName)
+                jsonString = Json.encodeToString(contentData)
+            }
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+            val jsonObject = Json.parseToJsonElement(postRequestResult)
+            val resultElement = jsonObject.jsonObject["result"]
+            val resultValue: String? =
+                if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                    resultElement.contentOrNull!!.toString()
+                } else {
+                    null
+                }
+            if (resultValue != "") {
+                if (resultValue != null) {
+                    civInfo.tech.techsToResearch.add(resultValue)
+                }
+            }
+        }
+        else{
+            while(civInfo.tech.freeTechs > 0) {
             val costs = getGroupedResearchableTechs()
             if (costs.isEmpty()) return
 
             val mostExpensiveTechs = costs[costs.size - 1]
             civInfo.tech.getFreeTechnology(mostExpensiveTechs.random().name)
         }
+            if (civInfo.tech.techsToResearch.isEmpty()) {
+                val costs = getGroupedResearchableTechs()
+                if (costs.isEmpty()) return
+
+                val cheapestTechs = costs[0]
+                //Do not consider advanced techs if only one tech left in cheapest group
+                val techToResearch: Technology =
+                    if (cheapestTechs.size == 1 || costs.size == 1) {
+                        cheapestTechs.random()
+                    } else {
+                        //Choose randomly between cheapest and second cheapest group
+                        val techsAdvanced = costs[1]
+                        (cheapestTechs + techsAdvanced).random()
+                    }
+
+                civInfo.tech.techsToResearch.add(techToResearch.name)
+
+        }
+
+        }
+    }
+    fun chooseTechToResearch_civsim(civInfo: Civilization): String {
+        fun getGroupedResearchableTechs(): List<List<Technology>> {
+            val researchableTechs = civInfo.gameInfo.ruleset.technologies.values
+                .asSequence()
+                .filter { civInfo.tech.canBeResearched(it.name) }
+                .groupBy { it.cost }
+            return researchableTechs.toSortedMap().values.toList()
+        }
+
+        while (civInfo.tech.freeTechs > 0) {
+            val costs = getGroupedResearchableTechs()
+            if (costs.isEmpty()) return ""
+
+            val mostExpensiveTechs = costs[costs.size - 1]
+            civInfo.tech.getFreeTechnology(mostExpensiveTechs.random().name)
+        }
         if (civInfo.tech.techsToResearch.isEmpty()) {
             val costs = getGroupedResearchableTechs()
-            if (costs.isEmpty()) return
+            if (costs.isEmpty()) return ""
 
             val cheapestTechs = costs[0]
             //Do not consider advanced techs if only one tech left in cheapest group
@@ -283,10 +436,11 @@ object NextTurnAutomation {
                     (cheapestTechs + techsAdvanced).random()
                 }
 
-            civInfo.tech.techsToResearch.add(techToResearch.name)
+//             civInfo.tech.techsToResearch.add(techToResearch.name)
+            return techToResearch.name
         }
+        return ""
     }
-
     private fun adoptPolicy(civInfo: Civilization) {
         /*
         # Branch-based policy-to-adopt decision
@@ -389,17 +543,18 @@ object NextTurnAutomation {
 
 
     private fun automateUnits(civInfo: Civilization,post: Boolean) {
+//         sortedBy { unit -> getUnitPriority(unit, isAtWar) }
         val isAtWar = civInfo.isAtWar()
-        val sortedUnits = civInfo.units.getCivUnits().sortedBy { unit -> getUnitPriority(unit, isAtWar) }
+        val sortedUnits = civInfo.units.getCivUnits()
         var id = 1
         for (unit in sortedUnits) {
-            UnitAutomation.automateUnitMoves_easy(unit, id, post )
+            UnitAutomation.automateUnitMoves_civsim(unit, id, post )
             id++
         }
     }
     fun getunits(civInfo: Civilization,id:Int):MapUnit?{
         val isAtWar = civInfo.isAtWar()
-        val sortedUnits = civInfo.units.getCivUnits().sortedBy { unit -> getUnitPriority(unit, isAtWar) }
+        val sortedUnits = civInfo.units.getCivUnits()
         var count=1
         for (unit in sortedUnits) {
             if (count==id) return unit
@@ -410,12 +565,12 @@ object NextTurnAutomation {
         return mapUnit
     }
 
-    private fun automateUnits_modify(civInfo: Civilization,workerAuto:Boolean,post: Boolean){
+    private fun automateUnits_civsim(civInfo: Civilization,workerAuto:Boolean,post: Boolean){
         val isAtWar = civInfo.isAtWar()
-        val sortedUnits = civInfo.units.getCivUnits().sortedBy { unit -> getUnitPriority(unit, isAtWar) }
+        val sortedUnits = civInfo.units.getCivUnits()
         var id = 1
         for (unit in sortedUnits) {
-            UnitAutomation.automateUnitMoves_modify(unit, id, workerAuto,post)
+            UnitAutomation.automateUnitMoves_civsim(unit, id, workerAuto,post)
             id++
         }
     }
