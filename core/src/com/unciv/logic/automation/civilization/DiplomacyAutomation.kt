@@ -60,11 +60,11 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentDataV3("change_closeness", civInfo.civName, otherCiv.civName)
+                    val contentData = ContentDataV4("", civInfo.civName,otherCiv.civName,"change_closeness")
                     jsonString = Json.encodeToString(contentData)
                 }
 //                 val postRequestResult = sendPostRequest("http://127.0.0.1:2337/wantsToSignDeclarationOfFrienship", jsonString)
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -236,10 +236,10 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentDataV3("open_borders", civInfo.civName, otherCiv.civName)
+                    val contentData = ContentDataV4("", civInfo.civName, otherCiv.civName, "open_borders")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -389,10 +389,10 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentDataV3("form_ally", civInfo.civName, otherCiv.civName)
+                    val contentData = ContentDataV4("", civInfo.civName, otherCiv.civName, "form_ally")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -576,10 +576,10 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentDataV3("declare_war", civInfo.civName, city.civName)
+                    val contentData = ContentDataV4("", civInfo.civName, city.civName, "declare_war")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
+                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/decision",jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -941,11 +941,10 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData =
-                        ContentDataV3("seek_peace", civInfo.civName, enemy.civName)
+                    val contentData = ContentDataV4("", civInfo.civName, enemy.civName, "seek_peace")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
+                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/decision",jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -1029,11 +1028,11 @@ fun sendcanSignResearchAgreementsWith(content:String,civInfo1: Civilization,civI
             jsonString = Json.encodeToString(contentData)
         }
         else {
-            val contentData = ContentDataV3(content, civInfo1.civName, civInfo2.civName)
+            val contentData = ContentDataV4("", civInfo1.civName, civInfo2.civName, content)
             jsonString = Json.encodeToString(contentData)
         }
 //         val jsonString = Json.encodeToString(contentData)
-        val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
+        val postRequestResult= sendPostRequest("http://127.0.0.1:2337/decision",jsonString)
         val jsonObject = Json.parseToJsonElement(postRequestResult)
         val resultElement = jsonObject.jsonObject["result"]
         val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {

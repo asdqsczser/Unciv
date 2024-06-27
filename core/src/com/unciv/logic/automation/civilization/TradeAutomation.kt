@@ -49,10 +49,10 @@ object TradeAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
-                    val contentData = ContentDataV3(content, civInfo.civName, otherCiv.civName)
+                    val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/Decision", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/reply_trade", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -212,10 +212,16 @@ object TradeAutomation {
 //          val tradeLogic = TradeLogic(civInfo, otherCivInfo)
          val jsonString: String
          if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-             val contentData = ContentDataV3("common_enemy", civInfo.civName,civInfo.civName)
-             jsonString = Json.encodeToString(contentData)
+             if (DebugUtils.NEED_GameInfo) {
+                 val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
+                 val contentData = ContentDataV4(gameinfo, civInfo.civName,civInfo.civName,"common_enemy")
+                 jsonString = Json.encodeToString(contentData)
+             } else {
+                 val contentData = ContentDataV4("", civInfo.civName,civInfo.civName,"common_enemy",)
+                 jsonString = Json.encodeToString(contentData)
+             }
              val postRequestResult =
-                 sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+                 sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
              val jsonObject = Json.parseToJsonElement(postRequestResult)
              val resultElement = jsonObject.jsonObject["result"]
              val resultValue: Boolean? =
@@ -280,10 +286,18 @@ object TradeAutomation {
 
     private fun potentialLuxuryTrades(civInfo: Civilization, otherCivInfo: Civilization): ArrayList<Trade> {
         val tradeLogic = TradeLogic(civInfo, otherCivInfo)
+        var jsonString : String
         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-            val contentData = ContentDataV3("buy_luxury", civInfo.civName,otherCivInfo.civName)
-            val jsonString = Json.encodeToString(contentData)
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+            if (DebugUtils.NEED_GameInfo) {
+                val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
+                val contentData = ContentDataV4(gameinfo, civInfo.civName, otherCivInfo.civName, "buy_luxury")
+                jsonString = Json.encodeToString(contentData)
+            }
+            else {
+                val contentData = ContentDataV4("", civInfo.civName, otherCivInfo.civName, "buy_luxury")
+                jsonString = Json.encodeToString(contentData)
+            }
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull

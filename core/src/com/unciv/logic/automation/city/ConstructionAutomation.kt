@@ -104,10 +104,10 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             }
             else {
                 val contentData =
-                    ContentDataV3("production_priority", civInfo.civName, city.name)
+                    ContentDataV4("",civInfo.civName, city.name,"production_priority")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val resultValue: String? =
