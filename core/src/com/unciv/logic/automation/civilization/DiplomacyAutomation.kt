@@ -937,12 +937,12 @@ object DiplomacyAutomation {
 //                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                 if (DebugUtils.NEED_GameInfo) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
-                    val contentData = ContentDataV4(content, civInfo.civName, enemy.civName, "speek_peace")
+                    val contentData = ContentDataV4(content, civInfo.civName, enemy.civName, "seek_peace")
                     jsonString = Json.encodeToString(contentData)
                 }
                 else {
                     val contentData =
-                        ContentDataV3("speek_peace", civInfo.civName, enemy.civName)
+                        ContentDataV3("seek_peace", civInfo.civName, enemy.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
                 val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_tools",jsonString)
