@@ -184,8 +184,7 @@ object NextTurnAutomation {
                         val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
                         jsonString = Json.encodeToString(contentData)
                     } else {
-                        val contentData =
-                            ContentDataV3(content, civInfo.civName, requestingCiv.civName)
+                        val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
                         jsonString = Json.encodeToString(contentData)
                     }
 //                     val contentData =
