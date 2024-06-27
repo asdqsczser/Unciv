@@ -21,16 +21,16 @@ object DebugUtils {
      */
     var SIMULATE_UNTIL_TURN: Int = 1
 
-    /** Set it to true when you want AI to host your civilization; for testing purposes only. */
+    /** Set it to true only when SIMULATE_UNTIL_TURN > 1 */
     var SIMULATEING: Boolean = false
 
-    /** Use the AI module via http request */
+    /** Use the AI module via http request, set false when build jar for simulator */
     var NEED_POST: Boolean = true
 
     /** Pass gameinfo with each interface request. Enabling this would increase processing time */
     var NEED_GameInfo: Boolean = false
 
     /** Disregard this option. Set it to true. */
-    var Active_Diplomacy:Boolean = true
+    var Active_Diplomacy: Boolean = true
 
 }
