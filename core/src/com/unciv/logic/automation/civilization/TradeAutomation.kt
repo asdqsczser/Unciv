@@ -215,7 +215,7 @@ object TradeAutomation {
              val contentData = ContentDataV3("common_enemy", civInfo.civName,civInfo.civName)
              jsonString = Json.encodeToString(contentData)
              val postRequestResult =
-                 sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+                 sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
              val jsonObject = Json.parseToJsonElement(postRequestResult)
              val resultElement = jsonObject.jsonObject["result"]
              val resultValue: Boolean? =
@@ -283,7 +283,7 @@ object TradeAutomation {
         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
             val contentData = ContentDataV3("buy_luxury", civInfo.civName,otherCivInfo.civName)
             val jsonString = Json.encodeToString(contentData)
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull

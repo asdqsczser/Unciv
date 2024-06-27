@@ -64,7 +64,7 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
 //                 val postRequestResult = sendPostRequest("http://127.0.0.1:2337/wantsToSignDeclarationOfFrienship", jsonString)
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -239,7 +239,7 @@ object DiplomacyAutomation {
                     val contentData = ContentDataV3("open_borders", civInfo.civName, otherCiv.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -392,7 +392,7 @@ object DiplomacyAutomation {
                     val contentData = ContentDataV3("form_ally", civInfo.civName, otherCiv.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -579,7 +579,7 @@ object DiplomacyAutomation {
                     val contentData = ContentDataV3("declare_war", civInfo.civName, city.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_tools",jsonString)
+                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -945,7 +945,7 @@ object DiplomacyAutomation {
                         ContentDataV3("seek_peace", civInfo.civName, enemy.civName)
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_tools",jsonString)
+                val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -1033,7 +1033,7 @@ fun sendcanSignResearchAgreementsWith(content:String,civInfo1: Civilization,civI
             jsonString = Json.encodeToString(contentData)
         }
 //         val jsonString = Json.encodeToString(contentData)
-        val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_tools",jsonString)
+        val postRequestResult= sendPostRequest("http://127.0.0.1:2337/get_skills",jsonString)
         val jsonObject = Json.parseToJsonElement(postRequestResult)
         val resultElement = jsonObject.jsonObject["result"]
         val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {

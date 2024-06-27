@@ -164,7 +164,7 @@ object NextTurnAutomation {
         if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
             val contentData = ContentDataV2(content, civInfo.civName)
             val jsonString = Json.encodeToString(contentData)
-            sendPostRequest("http://127.0.0.1:2337/use_tools", jsonString)
+            sendPostRequest("http://127.0.0.1:2337/use_skills", jsonString)
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -361,7 +361,7 @@ object NextTurnAutomation {
                 val contentData = ContentDataV3("choose_technology", civInfo.civName,civInfo.civName)
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_tools", jsonString)
+            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/get_skills", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val resultValue: String? =
