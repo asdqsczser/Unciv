@@ -164,7 +164,7 @@ object NextTurnAutomation {
         if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
             val contentData = ContentDataV2(content, civInfo.civName)
             val jsonString = Json.encodeToString(contentData)
-            sendPostRequest("http://127.0.0.1:2337/get_early_decision", jsonString)
+            sendPostRequest(DebugUtils.AI_Server_Address+"get_early_decision", jsonString)
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -191,7 +191,7 @@ object NextTurnAutomation {
 //                         ContentData_three(content, civInfo.civName, requestingCiv.civName)
 //                      jsonString = Json.encodeToString(contentData)
                     val postRequestResult = sendPostRequest(
-                        "http://127.0.0.1:2337/wantsToDeclarationOfFrienship",
+                        DebugUtils.AI_Server_Address+"wantsToDeclarationOfFrienship",
                         jsonString
                     )
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
@@ -360,7 +360,7 @@ object NextTurnAutomation {
                 val contentData = ContentDataV4("", civInfo.civName,civInfo.civName,"choose_technology")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
+            val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val resultValue: String? =

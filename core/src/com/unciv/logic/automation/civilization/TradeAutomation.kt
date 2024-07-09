@@ -52,7 +52,7 @@ object TradeAutomation {
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest("http://127.0.0.1:2337/reply_trade", jsonString)
+                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"reply_trade", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -221,7 +221,7 @@ object TradeAutomation {
                  jsonString = Json.encodeToString(contentData)
              }
              val postRequestResult =
-                 sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
+                 sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
              val jsonObject = Json.parseToJsonElement(postRequestResult)
              val resultElement = jsonObject.jsonObject["result"]
              val resultValue: Boolean? =
@@ -297,7 +297,7 @@ object TradeAutomation {
                 val contentData = ContentDataV4("", civInfo.civName, otherCivInfo.civName, "buy_luxury")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest("http://127.0.0.1:2337/decision", jsonString)
+            val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
             val jsonObject = Json.parseToJsonElement(postRequestResult)
             val resultElement = jsonObject.jsonObject["result"]
             val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull

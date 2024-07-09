@@ -12,6 +12,7 @@ import com.unciv.models.metadata.ScreenSize
 import com.unciv.models.metadata.WindowState
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.screens.basescreen.BaseScreen
+import com.unciv.utils.DebugUtils
 import com.unciv.utils.Display
 import com.unciv.utils.Log
 import kotlin.math.max
@@ -21,6 +22,7 @@ internal object DesktopLauncher {
     @JvmStatic
     fun main(arg: Array<String>) {
 
+        DebugUtils.initialize(arg)
         // Setup Desktop logging
         Log.backend = DesktopLogBackend()
 

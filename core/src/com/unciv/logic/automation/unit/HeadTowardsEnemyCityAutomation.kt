@@ -11,6 +11,7 @@ import com.unciv.logic.files.UncivFiles
 import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.mapunit.movement.PathsToTilesWithinTurn
 import com.unciv.logic.map.tile.Tile
+import com.unciv.utils.DebugUtils
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -26,7 +27,7 @@ object HeadTowardsEnemyCityAutomation {
         val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
         val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
         val jsonString = Json.encodeToString(contentData)
-        val postRequestResult= sendPostRequest("http://127.0.0.1:2337/getEnemyCitiesByPriority",jsonString)
+        val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"getEnemyCitiesByPriority",jsonString)
 //         val jsonObject = Json.parseToJsonElement(postRequestResult)
 //         val resultElement = jsonObject.jsonObject["result"]
 //         val resultValue: String? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {

@@ -19,7 +19,7 @@ object DebugUtils {
      *  Does not update World View changes until finished.
      *  Set to 0 to disable.
      */
-    var SIMULATE_UNTIL_TURN: Int = 1
+    var SIMULATE_UNTIL_TURN: Int = 5
 
     /** Set it to true only when SIMULATE_UNTIL_TURN > 1 */
     var SIMULATEING: Boolean = false
@@ -33,4 +33,38 @@ object DebugUtils {
     /** Disregard this option. Set it to true. */
     var Active_Diplomacy: Boolean = true
 
+    var AI_Server_Address: String = "http://127.0.0.1:2337/"
+    fun initialize(args: Array<String>) {
+        if (args.isEmpty()) return
+        for (arg in args) {
+            val (key, value) = arg.split("=")
+            if (key == "NEED_POST") {
+                NEED_POST = value.toBoolean()
+            }
+            else if (key == "NEED_GameInfo") {
+                NEED_GameInfo = value.toBoolean()
+            }
+            else if (key == "Active_Diplomacy") {
+                Active_Diplomacy = value.toBoolean()
+            }
+            else if (key == "AI_Server_Address") {
+                AI_Server_Address = value
+            }
+            else if (key == "SIMULATE_UNTIL_TURN") {
+                SIMULATE_UNTIL_TURN = value.toInt()
+            }
+            else if (key == "SIMULATEING") {
+                SIMULATEING = value.toBoolean()
+            }
+            else if (key == "SUPERCHARGED") {
+                SUPERCHARGED = value.toBoolean()
+            }
+            else if (key == "SHOW_TILE_COORDS") {
+                SHOW_TILE_COORDS = value.toBoolean()
+            }
+            else if (key == "VISIBLE_MAP") {
+                VISIBLE_MAP = value.toBoolean()
+            }
+        }
+    }
 }
