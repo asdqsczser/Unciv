@@ -23,39 +23,32 @@ object HeadTowardsEnemyCityAutomation {
      */
     fun tryHeadTowardsEnemyCity_civsim(unit: MapUnit, id:Int): Boolean {
         if (unit.civ.cities.isEmpty()) return false
-
-        val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
-        val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
-        val jsonString = Json.encodeToString(contentData)
-        val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"getEnemyCitiesByPriority",jsonString)
-//         val jsonObject = Json.parseToJsonElement(postRequestResult)
-//         val resultElement = jsonObject.jsonObject["result"]
-//         val resultValue: String? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-//             resultElement.contentOrNull // 获取内容作为字符串
-//         } else {
-//             null // 处理 "result" 不是字符串或字段不存在的情况
-//         }
-        if (postRequestResult=="None") return false
-        val (x, y) = postRequestResult.split(",").map { it.toInt() }
-//         var flag = false
-//         var closestReachableEnemyCity = City()
-//         for (city in unit.civ.cities){
-//             if (city.name==resultValue) {
-//                 closestReachableEnemyCity = city
-//                 flag = true
-//             }
-//         }
-//         if (!flag) return false
-//         val closestReachableEnemyCity = getEnemyCities(unit)
-//             ?: return false // No enemy city reachable
-        val tile = unit.civ.gameInfo.tileMap.get(x,y)
-        return headTowardsEnemyCity(
-            unit,
+        var flag = 1
+        if (DebugUtils.NEED_POST){
+            try {
+                val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
+                val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
+                val jsonString = Json.encodeToString(contentData)
+                val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"getEnemyCitiesByPriority",jsonString)
+                if (postRequestResult=="None") return tryHeadTowardsEnemyCity(unit)
+                val (x, y) = postRequestResult.split(",").map { it.toInt() }
+                val tile = unit.civ.gameInfo.tileMap.get(x,y)
+                return headTowardsEnemyCity(
+                    unit,
 //             closestReachableEnemyCity.getCenterTile(),
-            tile,
-            // This should be cached after the `canReach` call above.
-            unit.movement.getShortestPath(tile)
-        )
+                    tile,
+                    // This should be cached after the `canReach` call above.
+                    unit.movement.getShortestPath(tile)
+                )
+            }
+            catch (e:Exception){
+                flag = 0
+            }
+        }
+        if (!DebugUtils.NEED_POST||flag==0){
+            tryHeadTowardsEnemyCity(unit)
+        }
+        return false // No enemy city reachable
     }
     fun tryHeadTowardsEnemyCity(unit: MapUnit): Boolean {
         if (unit.civ.cities.isEmpty()) return false

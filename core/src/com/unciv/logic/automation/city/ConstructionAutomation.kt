@@ -4,6 +4,7 @@ import com.unciv.GUI
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.automation.civilization.ContentDataV4
 import com.unciv.logic.automation.civilization.ContentDataV3
+import com.unciv.logic.automation.civilization.GameId
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.automation.civilization.sendPostRequest
 import com.unciv.logic.city.CityConstructions
@@ -94,6 +95,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
     fun chooseNextConstruction() {
         if (cityConstructions.getCurrentConstruction() !is PerpetualConstruction) return  // don't want to be stuck on these forever
         var chosenConstruction = ""
+        var flag = 1
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING) {
             val jsonString: String
             if (DebugUtils.NEED_GameInfo){
@@ -103,26 +105,33 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
                 jsonString = Json.encodeToString(contentData)
             }
             else {
+                val gameid = GameId(civInfo.gameInfo.gameId)
+                val gameid_json = Json.encodeToString(gameid)
                 val contentData =
-                    ContentDataV4("",civInfo.civName, city.name,"production_priority")
+                    ContentDataV4(gameid_json,civInfo.civName, city.name,"production_priority")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
-            val jsonObject = Json.parseToJsonElement(postRequestResult)
-            val resultElement = jsonObject.jsonObject["result"]
-            val resultValue: String? =
-                if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                    resultElement.contentOrNull!!.toString()
-                } else {
-                    ""
+            try {
+                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val jsonObject = Json.parseToJsonElement(postRequestResult)
+                val resultElement = jsonObject.jsonObject["result"]
+                val resultValue: String? =
+                    if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                        resultElement.contentOrNull!!.toString()
+                    } else {
+                        ""
+                    }
+                if (resultValue != null && resultValue != "None") {
+                    chosenConstruction = resultValue
                 }
-            if (resultValue != null && resultValue != "None") {
-                chosenConstruction =resultValue
+                else return
             }
-            else return
+            catch (e: Exception){
+                flag = 0
+            }
 
         }
-        else {
+        if (flag == 0||!(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)) {
             addFoodBuildingChoice()
             addProductionBuildingChoice()
             addGoldBuildingChoice()

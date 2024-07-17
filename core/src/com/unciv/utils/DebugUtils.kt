@@ -34,6 +34,10 @@ object DebugUtils {
     var Active_Diplomacy: Boolean = true
 
     var AI_Server_Address: String = "http://127.0.0.1:2337/"
+
+    var LLM_Api_Key: String = ""
+
+    var LLM_Model:String = ""
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
@@ -64,6 +68,12 @@ object DebugUtils {
             }
             else if (key == "VISIBLE_MAP") {
                 VISIBLE_MAP = value.toBoolean()
+            }
+            else if (key == "LLM_Api_Key") {
+                LLM_Api_Key = value
+            }
+            else if (key == "LLM_Model") {
+                LLM_Model = value
             }
         }
     }

@@ -294,12 +294,14 @@ object UnitAutomation {
 
         // Focus all units without a specific target on the enemy city closest to one of our cities
         if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-            if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity_civsim(unit, id)) return
+            try {
+                if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity_civsim(unit, id)) return
+            }
+            catch (e:Exception) {
+                if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity(unit)) return
+            }
         }
-        else
-        {
-            if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity(unit)) return
-        }
+        else if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity(unit)) return
 
         if (tryGarrisoningRangedLandUnit(unit)) return
 
@@ -387,6 +389,7 @@ object UnitAutomation {
         if (tryTakeBackCapturedCity(unit)) return
 
         // Focus all units without a specific target on the enemy city closest to one of our cities
+
         if (post){
             if (HeadTowardsEnemyCityAutomation.tryHeadTowardsEnemyCity_civsim(unit, id)) return
         }

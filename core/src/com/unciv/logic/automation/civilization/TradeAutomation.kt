@@ -42,6 +42,7 @@ object TradeAutomation {
              * the same resource to ANOTHER civ in this turn. Complicated!
              */
             civInfo.tradeRequests.remove(tradeRequest)
+            var flag = 1
             if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
                 var jsonString: String
                 if(DebugUtils.NEED_GameInfo){
@@ -52,26 +53,32 @@ object TradeAutomation {
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
                     jsonString = Json.encodeToString(contentData)
                 }
-                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"reply_trade", jsonString)
-                val jsonObject = Json.parseToJsonElement(postRequestResult)
-                val resultElement = jsonObject.jsonObject["result"]
-                val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                    if (resultElement.contentOrNull == "yes") {
-                        true
+                try {
+                    val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"reply_trade", jsonString)
+                    val jsonObject = Json.parseToJsonElement(postRequestResult)
+                    val resultElement = jsonObject.jsonObject["result"]
+                    val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                        if (resultElement.contentOrNull == "yes") {
+                            true
+                        } else {
+                            resultElement.contentOrNull!!.toBoolean()
+                        }
                     } else {
-                        resultElement.contentOrNull!!.toBoolean()
+                        null // 处理 "result" 不是布尔值或字段不存在的情况
                     }
-                } else {
-                    null // 处理 "result" 不是布尔值或字段不存在的情况
-                }
-                if(resultValue == true){
-                    tradeLogic.acceptTrade()
-                    otherCiv.addNotification("[${civInfo.civName}] has accepted your trade request", NotificationCategory.Trade, NotificationIcon.Trade, civInfo.civName)
-                }else{
+                    if(resultValue == true){
+                        tradeLogic.acceptTrade()
+                        otherCiv.addNotification("[${civInfo.civName}] has accepted your trade request", NotificationCategory.Trade, NotificationIcon.Trade, civInfo.civName)
+                    }else{
                         tradeRequest.decline(civInfo)
+                    }
                 }
+                catch (e: Exception){
+                    flag=0
+                }
+
             }
-            else{
+            if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) || flag == 0 ){
                 if (TradeEvaluation().isTradeAcceptable(tradeLogic.currentTrade, civInfo, otherCiv)) {
                     tradeLogic.acceptTrade()
                     otherCiv.addNotification("[${civInfo.civName}] has accepted your trade request", NotificationCategory.Trade, NotificationIcon.Trade, civInfo.civName)
@@ -217,44 +224,51 @@ object TradeAutomation {
                  val contentData = ContentDataV4(gameinfo, civInfo.civName,civInfo.civName,"common_enemy")
                  jsonString = Json.encodeToString(contentData)
              } else {
-                 val contentData = ContentDataV4("", civInfo.civName,civInfo.civName,"common_enemy",)
+                 val gameid = GameId(civInfo.gameInfo.gameId)
+                 val gameid_json = Json.encodeToString(gameid)
+                 val contentData = ContentDataV4(gameid_json, civInfo.civName,civInfo.civName,"common_enemy",)
                  jsonString = Json.encodeToString(contentData)
              }
-             val postRequestResult =
-                 sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
-             val jsonObject = Json.parseToJsonElement(postRequestResult)
-             val resultElement = jsonObject.jsonObject["result"]
-             val resultValue: Boolean? =
-                 if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                     resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
-                 } else {
-                     null // 处理 "result" 不是布尔值或字段不存在的情况
-                 }
-             if (resultValue == true) {
-                 val tocivElement = jsonObject.jsonObject["to_civ"]?.jsonPrimitive?.content
-                 val enemycivElement = jsonObject.jsonObject["enemy_civ"]?.jsonPrimitive?.content
-                 val trade = Trade()
-                 val otherCiv = civInfo.gameInfo.getCivilization(tocivElement!!)
-                 val enemyCiv = civInfo.gameInfo.getCivilization(enemycivElement!!)
-                 //如果已经在交战中则不需要再次宣战
-                 if (civInfo.isAtWarWith(enemyCiv)) {
-                     val theiroffer =
-                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
-                     trade.theirOffers.add(theiroffer)
-                     val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
-                     otherCiv.tradeRequests.add(tradeRequest)
-                 } else {
-                     val ouroffer =
-                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
-                     val theiroffer =
-                         TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
-                     trade.ourOffers.add(ouroffer)
-                     trade.theirOffers.add(theiroffer)
-                     val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
-                     otherCiv.tradeRequests.add(tradeRequest)
-                 }
+             try {
+                 val postRequestResult =
+                     sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                 val jsonObject = Json.parseToJsonElement(postRequestResult)
+                 val resultElement = jsonObject.jsonObject["result"]
+                 val resultValue: Boolean? =
+                     if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                         resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                     } else {
+                         null // 处理 "result" 不是布尔值或字段不存在的情况
+                     }
+                 if (resultValue == true) {
+                     val tocivElement = jsonObject.jsonObject["to_civ"]?.jsonPrimitive?.content
+                     val enemycivElement = jsonObject.jsonObject["enemy_civ"]?.jsonPrimitive?.content
+                     val trade = Trade()
+                     val otherCiv = civInfo.gameInfo.getCivilization(tocivElement!!)
+                     val enemyCiv = civInfo.gameInfo.getCivilization(enemycivElement!!)
+                     //如果已经在交战中则不需要再次宣战
+                     if (civInfo.isAtWarWith(enemyCiv)) {
+                         val theiroffer =
+                             TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
+                         trade.theirOffers.add(theiroffer)
+                         val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
+                         otherCiv.tradeRequests.add(tradeRequest)
+                     } else {
+                         val ouroffer =
+                             TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
+                         val theiroffer =
+                             TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
+                         trade.ourOffers.add(ouroffer)
+                         trade.theirOffers.add(theiroffer)
+                         val tradeRequest = TradeRequest(civInfo.civName, trade.reverse())
+                         otherCiv.tradeRequests.add(tradeRequest)
+                     }
 
+                 }
              }
+            catch (e: Exception){
+                println("error:e")
+            }
          }
      }
      fun exchangeLuxuries(civInfo: Civilization) {
@@ -287,6 +301,7 @@ object TradeAutomation {
     private fun potentialLuxuryTrades(civInfo: Civilization, otherCivInfo: Civilization): ArrayList<Trade> {
         val tradeLogic = TradeLogic(civInfo, otherCivInfo)
         var jsonString : String
+        var flag = 1
         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
             if (DebugUtils.NEED_GameInfo) {
                 val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
@@ -294,37 +309,44 @@ object TradeAutomation {
                 jsonString = Json.encodeToString(contentData)
             }
             else {
-                val contentData = ContentDataV4("", civInfo.civName, otherCivInfo.civName, "buy_luxury")
+                val gameid = GameId(civInfo.gameInfo.gameId)
+                val gameid_json = Json.encodeToString(gameid)
+                val contentData = ContentDataV4(gameid_json, civInfo.civName, otherCivInfo.civName, "buy_luxury")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
-            val jsonObject = Json.parseToJsonElement(postRequestResult)
-            val resultElement = jsonObject.jsonObject["result"]
-            val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull
-            val luxuryElement = jsonObject.jsonObject["luxury"]?.jsonPrimitive?.content
-            val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
-            } else {
-                null // 处理 "result" 不是布尔值或字段不存在的情况
-            }
-            val trades = ArrayList<Trade>()
-            if(resultValue == true){
-                val ourTradableLuxuryResources = tradeLogic.ourAvailableOffers
-                    .filter { it.type == TradeType.Gold_Per_Turn && it.amount > goldElement!! }
-                val theirTradableLuxuryResources = tradeLogic.theirAvailableOffers
-                    .filter { it.name == luxuryElement &&it.type == TradeType.Luxury_Resource && it.amount > 1 }
-                if (ourTradableLuxuryResources.isNotEmpty() && theirTradableLuxuryResources.isNotEmpty()) {
-                    val trade = Trade()
-                    trade.ourOffers.add(ourTradableLuxuryResources[0].copy(amount = goldElement!!))
-                    trade.theirOffers.add(theirTradableLuxuryResources[0].copy(amount = 1))
-                    trades.add(trade)
-                    return trades
+            try {
+                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val jsonObject = Json.parseToJsonElement(postRequestResult)
+                val resultElement = jsonObject.jsonObject["result"]
+                val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull
+                val luxuryElement = jsonObject.jsonObject["luxury"]?.jsonPrimitive?.content
+                val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                    resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                } else {
+                    null // 处理 "result" 不是布尔值或字段不存在的情况
                 }
+                val trades = ArrayList<Trade>()
+                if(resultValue == true){
+                    val ourTradableLuxuryResources = tradeLogic.ourAvailableOffers
+                        .filter { it.type == TradeType.Gold_Per_Turn && it.amount > goldElement!! }
+                    val theirTradableLuxuryResources = tradeLogic.theirAvailableOffers
+                        .filter { it.name == luxuryElement &&it.type == TradeType.Luxury_Resource && it.amount > 1 }
+                    if (ourTradableLuxuryResources.isNotEmpty() && theirTradableLuxuryResources.isNotEmpty()) {
+                        val trade = Trade()
+                        trade.ourOffers.add(ourTradableLuxuryResources[0].copy(amount = goldElement!!))
+                        trade.theirOffers.add(theirTradableLuxuryResources[0].copy(amount = 1))
+                        trades.add(trade)
+                        return trades
+                    }
+                }
+                return trades
             }
-            return trades
+            catch (e: Exception){
+                flag = 0
+            }
 
         }
-        else{
+        if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) || flag == 0){
             val ourTradableLuxuryResources = tradeLogic.ourAvailableOffers
                 .filter { it.type == TradeType.Luxury_Resource && it.amount > 1 }
             val theirTradableLuxuryResources = tradeLogic.theirAvailableOffers
@@ -348,7 +370,7 @@ object TradeAutomation {
             }
             return trades
         }
-
+        return ArrayList() // Should never reach here
     }
 
 }

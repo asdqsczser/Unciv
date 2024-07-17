@@ -40,7 +40,6 @@ object NextTurnAutomation {
     /** Top-level AI turn task list */
     fun automateCivMoves(civInfo: Civilization) {
         if (civInfo.isBarbarian()) return BarbarianAutomation(civInfo).automate()
-
         if (civInfo.gameInfo.turns % 5 == 0 || civInfo.gameInfo.turns % 5 == 1) {
 
             respondToPopupAlerts(civInfo)
@@ -161,10 +160,15 @@ object NextTurnAutomation {
     private fun respondToPopupAlerts(civInfo: Civilization) {
         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
         ///该回合请求使用哪几种技能
-        if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-            val contentData = ContentDataV2(content, civInfo.civName)
-            val jsonString = Json.encodeToString(contentData)
-            sendPostRequest(DebugUtils.AI_Server_Address+"get_early_decision", jsonString)
+        try {
+            if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+                val contentData = ContentDataV2(content, civInfo.civName)
+                val jsonString = Json.encodeToString(contentData)
+                sendPostRequest(DebugUtils.AI_Server_Address+"get_early_decision", jsonString)
+            }
+        }
+        catch (e: Exception) {
+            println("Error in respondToPopupAlerts")
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -179,6 +183,7 @@ object NextTurnAutomation {
                 val requestingCiv = civInfo.gameInfo.getCivilization(popupAlert.value)
                 val diploManager = civInfo.getDiplomacyManager(requestingCiv)
                 var jsonString: String
+                var flag = 1
                 if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
                     if (DebugUtils.NEED_GameInfo) {
                         val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
@@ -190,42 +195,47 @@ object NextTurnAutomation {
 //                     val contentData =
 //                         ContentData_three(content, civInfo.civName, requestingCiv.civName)
 //                      jsonString = Json.encodeToString(contentData)
-                    val postRequestResult = sendPostRequest(
-                        DebugUtils.AI_Server_Address+"wantsToDeclarationOfFrienship",
-                        jsonString
-                    )
-                    val jsonObject = Json.parseToJsonElement(postRequestResult)
-                    val resultElement = jsonObject.jsonObject["result"]
-                    val resultValue: Boolean? =
-                        if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                            if (resultElement.contentOrNull == "yes") {
-                                true
+                    try {
+                        val postRequestResult = sendPostRequest(
+                            DebugUtils.AI_Server_Address+"wantsToDeclarationOfFrienship",
+                            jsonString
+                        )
+                        val jsonObject = Json.parseToJsonElement(postRequestResult)
+                        val resultElement = jsonObject.jsonObject["result"]
+                        val resultValue: Boolean? =
+                            if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                                if (resultElement.contentOrNull == "yes") {
+                                    true
+                                } else {
+                                    resultElement.contentOrNull!!.toBoolean()
+                                }
                             } else {
-                                resultElement.contentOrNull!!.toBoolean()
+                                null // 处理 "result" 不是布尔值或字段不存在的情况
                             }
+                        if (resultValue == true) {
+                            diploManager.signDeclarationOfFriendship()
+                            requestingCiv.addNotification(
+                                "We have signed a Declaration of Friendship with [${civInfo.civName}]!",
+                                NotificationCategory.Diplomacy,
+                                NotificationIcon.Diplomacy,
+                                civInfo.civName
+                            )
                         } else {
-                            null // 处理 "result" 不是布尔值或字段不存在的情况
+                            diploManager.otherCivDiplomacy()
+                                .setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
+                            requestingCiv.addNotification(
+                                "[${civInfo.civName}] has denied our Declaration of Friendship!",
+                                NotificationCategory.Diplomacy,
+                                NotificationIcon.Diplomacy,
+                                civInfo.civName
+                            )
                         }
-                    if (resultValue == true) {
-                        diploManager.signDeclarationOfFriendship()
-                        requestingCiv.addNotification(
-                            "We have signed a Declaration of Friendship with [${civInfo.civName}]!",
-                            NotificationCategory.Diplomacy,
-                            NotificationIcon.Diplomacy,
-                            civInfo.civName
-                        )
-                    } else {
-                        diploManager.otherCivDiplomacy()
-                            .setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
-                        requestingCiv.addNotification(
-                            "[${civInfo.civName}] has denied our Declaration of Friendship!",
-                            NotificationCategory.Diplomacy,
-                            NotificationIcon.Diplomacy,
-                            civInfo.civName
-                        )
+                    }
+                    catch (e: Exception) {
+                        flag = 0
                     }
                 }
-                else{
+                if (flag == 0 || !(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)) {
                     if (civInfo.diplomacyFunctions.canSignDeclarationOfFriendshipWith(requestingCiv)
                         && DiplomacyAutomation.wantsToSignDeclarationOfFrienship(civInfo,requestingCiv)) {
                         diploManager.signDeclarationOfFriendship()
@@ -349,6 +359,7 @@ object NextTurnAutomation {
                 .groupBy { it.cost }
             return researchableTechs.toSortedMap().values.toList()
         }
+        var flag = 1
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING){
             val jsonString: String
             if (DebugUtils.NEED_GameInfo){
@@ -357,32 +368,39 @@ object NextTurnAutomation {
                 jsonString = Json.encodeToString(contentData)
             }
             else{
-                val contentData = ContentDataV4("", civInfo.civName,civInfo.civName,"choose_technology")
+                val gameid = GameId(civInfo.gameInfo.gameId)
+                val gameid_json = Json.encodeToString(gameid)
+                val contentData = ContentDataV4(gameid_json, civInfo.civName,civInfo.civName,"choose_technology")
                 jsonString = Json.encodeToString(contentData)
             }
-            val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
-            val jsonObject = Json.parseToJsonElement(postRequestResult)
-            val resultElement = jsonObject.jsonObject["result"]
-            val resultValue: String? =
-                if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                    resultElement.contentOrNull!!.toString()
-                } else {
-                    null
-                }
-            if (resultValue != "") {
-                if (resultValue != null) {
-                    civInfo.tech.techsToResearch.add(resultValue)
+            try {
+                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val jsonObject = Json.parseToJsonElement(postRequestResult)
+                val resultElement = jsonObject.jsonObject["result"]
+                val resultValue: String? =
+                    if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
+                        resultElement.contentOrNull!!.toString()
+                    } else {
+                        null
+                    }
+                if (resultValue != "") {
+                    if (resultValue != null) {
+                        civInfo.tech.techsToResearch.add(resultValue)
+                    }
                 }
             }
+            catch (e: Exception) {
+                flag = 0
+            }
         }
-        else{
+        if (flag == 0 || !(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)){
             while(civInfo.tech.freeTechs > 0) {
-            val costs = getGroupedResearchableTechs()
-            if (costs.isEmpty()) return
+                val costs = getGroupedResearchableTechs()
+                if (costs.isEmpty()) return
 
-            val mostExpensiveTechs = costs[costs.size - 1]
-            civInfo.tech.getFreeTechnology(mostExpensiveTechs.random().name)
-        }
+                val mostExpensiveTechs = costs[costs.size - 1]
+                civInfo.tech.getFreeTechnology(mostExpensiveTechs.random().name)
+            }
             if (civInfo.tech.techsToResearch.isEmpty()) {
                 val costs = getGroupedResearchableTechs()
                 if (costs.isEmpty()) return

@@ -268,7 +268,9 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
             && gameInfo!!.civilizations.none { it.playerId == settings.multiplayer.userId }) {
             throw UncivShowableException("You are not allowed to spectate!")
         }
-
+        gameInfo?.gameParameters?.language = settings.language
+        gameInfo?.gameParameters?.llm_api_key = DebugUtils.LLM_Api_Key
+        gameInfo?.gameParameters?.llm_model = DebugUtils.LLM_Model
         initializeResources(prevGameInfo, newGameInfo)
 
         val isLoadingSameGame = worldScreen != null && prevGameInfo != null && prevGameInfo.gameId == newGameInfo.gameId

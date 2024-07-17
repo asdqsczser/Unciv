@@ -3,6 +3,7 @@ package com.unciv.models.metadata
 import com.unciv.logic.IsPartOfGameInfoSerialization
 import com.unciv.logic.civilization.PlayerType
 import com.unciv.models.ruleset.Speed
+import com.unciv.utils.DebugUtils
 
 
 @Suppress("EnumEntryName")  // These merit unusual names
@@ -51,6 +52,9 @@ class GameParameters : IsPartOfGameInfoSerialization { // Default values are the
     var maxTurns = 500
 
     var acceptedModCheckErrors = ""
+    var language = ""
+    var llm_api_key  = ""
+    var llm_model = ""
 
     fun clone(): GameParameters {
         val parameters = GameParameters()
@@ -83,6 +87,9 @@ class GameParameters : IsPartOfGameInfoSerialization { // Default values are the
         parameters.mods = LinkedHashSet(mods)
         parameters.maxTurns = maxTurns
         parameters.acceptedModCheckErrors = acceptedModCheckErrors
+        parameters.llm_api_key  = llm_api_key
+        parameters.language = language
+        parameters.llm_model = llm_model
         return parameters
     }
 
