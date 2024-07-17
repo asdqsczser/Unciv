@@ -19,7 +19,7 @@ object DebugUtils {
      *  Does not update World View changes until finished.
      *  Set to 0 to disable.
      */
-    var SIMULATE_UNTIL_TURN: Int = 5
+    var SIMULATE_UNTIL_TURN: Int = 0
 
     /** Set it to true only when SIMULATE_UNTIL_TURN > 1 */
     var SIMULATEING: Boolean = false
@@ -28,52 +28,43 @@ object DebugUtils {
     var NEED_POST: Boolean = true
 
     /** Pass gameinfo with each interface request. Enabling this would increase processing time */
-    var NEED_GameInfo: Boolean = false
+    var NEED_GAMEINFO: Boolean = false
 
     /** Disregard this option. Set it to true. */
-    var Active_Diplomacy: Boolean = true
+    var ACTIVE_DIPLOMACY: Boolean = true
 
-    var AI_Server_Address: String = "http://127.0.0.1:2337/"
+    var AI_SERVER_ADDRESS: String = "http://127.0.0.1:2337/"
 
-    var LLM_Api_Key: String = ""
+    var LLM_API_KEY: String = ""
 
-    var LLM_Model:String = ""
+    var LLM_MODEL: String = ""
+
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
             val (key, value) = arg.split("=")
             if (key == "NEED_POST") {
                 NEED_POST = value.toBoolean()
-            }
-            else if (key == "NEED_GameInfo") {
-                NEED_GameInfo = value.toBoolean()
-            }
-            else if (key == "Active_Diplomacy") {
-                Active_Diplomacy = value.toBoolean()
-            }
-            else if (key == "AI_Server_Address") {
-                AI_Server_Address = value
-            }
-            else if (key == "SIMULATE_UNTIL_TURN") {
+            } else if (key == "NEED_GAMEINFO") {
+                NEED_GAMEINFO = value.toBoolean()
+            } else if (key == "ACTIVE_DIPLOMACY") {
+                ACTIVE_DIPLOMACY = value.toBoolean()
+            } else if (key == "ACTIVE_DIPLOMACY") {
+                AI_SERVER_ADDRESS = value
+            } else if (key == "SIMULATE_UNTIL_TURN") {
                 SIMULATE_UNTIL_TURN = value.toInt()
-            }
-            else if (key == "SIMULATEING") {
+            } else if (key == "SIMULATEING") {
                 SIMULATEING = value.toBoolean()
-            }
-            else if (key == "SUPERCHARGED") {
+            } else if (key == "SUPERCHARGED") {
                 SUPERCHARGED = value.toBoolean()
-            }
-            else if (key == "SHOW_TILE_COORDS") {
+            } else if (key == "SHOW_TILE_COORDS") {
                 SHOW_TILE_COORDS = value.toBoolean()
-            }
-            else if (key == "VISIBLE_MAP") {
+            } else if (key == "VISIBLE_MAP") {
                 VISIBLE_MAP = value.toBoolean()
-            }
-            else if (key == "LLM_Api_Key") {
-                LLM_Api_Key = value
-            }
-            else if (key == "LLM_Model") {
-                LLM_Model = value
+            } else if (key == "LLM_API_KEY") {
+                LLM_API_KEY = value
+            } else if (key == "LLM_MODEL") {
+                LLM_MODEL = value
             }
         }
     }

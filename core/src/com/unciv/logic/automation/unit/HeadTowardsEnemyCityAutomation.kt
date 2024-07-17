@@ -19,7 +19,7 @@ object HeadTowardsEnemyCityAutomation {
 
     /** @returns whether the unit has taken this action */
     /**
-     * 尝试去敌人城市，只专注打一个敌人
+     * Try to go to the enemy city and focus only on fighting one enemy
      */
     fun tryHeadTowardsEnemyCity_civsim(unit: MapUnit, id:Int): Boolean {
         if (unit.civ.cities.isEmpty()) return false
@@ -29,7 +29,7 @@ object HeadTowardsEnemyCityAutomation {
                 val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
                 val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
                 val jsonString = Json.encodeToString(contentData)
-                val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"getEnemyCitiesByPriority",jsonString)
+                val postRequestResult= sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"getEnemyCitiesByPriority",jsonString)
                 if (postRequestResult=="None") return tryHeadTowardsEnemyCity(unit)
                 val (x, y) = postRequestResult.split(",").map { it.toInt() }
                 val tile = unit.civ.gameInfo.tileMap.get(x,y)

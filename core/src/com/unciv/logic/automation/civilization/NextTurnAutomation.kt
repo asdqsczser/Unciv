@@ -48,7 +48,7 @@ object NextTurnAutomation {
         if (civInfo.gameInfo.turns % 5 == 0){
             if (civInfo.isMajorCiv()) {
                 if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
-                    if (DebugUtils.Active_Diplomacy) {
+                    if (DebugUtils.ACTIVE_DIPLOMACY) {
                         DiplomacyAutomation.declareWar(civInfo)
                         DiplomacyAutomation.offerPeaceTreaty(civInfo)
                         DiplomacyAutomation.offerDeclarationOfFriendship(civInfo)
@@ -57,7 +57,7 @@ object NextTurnAutomation {
                 if (civInfo.gameInfo.isReligionEnabled()) {
                     ReligionAutomation.spendFaithOnReligion(civInfo)//
                 }
-                if (DebugUtils.Active_Diplomacy) {
+                if (DebugUtils.ACTIVE_DIPLOMACY) {
                     DiplomacyAutomation.offerOpenBorders(civInfo)
                     DiplomacyAutomation.offerResearchAgreement(civInfo)
                     DiplomacyAutomation.offerDefensivePact(civInfo)
@@ -164,7 +164,7 @@ object NextTurnAutomation {
             if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
                 val contentData = ContentDataV2(content, civInfo.civName)
                 val jsonString = Json.encodeToString(contentData)
-                sendPostRequest(DebugUtils.AI_Server_Address+"get_early_decision", jsonString)
+                sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"get_early_decision", jsonString)
             }
         }
         catch (e: Exception) {
@@ -185,7 +185,7 @@ object NextTurnAutomation {
                 var jsonString: String
                 var flag = 1
                 if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-                    if (DebugUtils.NEED_GameInfo) {
+                    if (DebugUtils.NEED_GAMEINFO) {
                         val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
                         jsonString = Json.encodeToString(contentData)
                     } else {
@@ -197,7 +197,7 @@ object NextTurnAutomation {
 //                      jsonString = Json.encodeToString(contentData)
                     try {
                         val postRequestResult = sendPostRequest(
-                            DebugUtils.AI_Server_Address+"wantsToDeclarationOfFrienship",
+                            DebugUtils.AI_SERVER_ADDRESS+"wantsToDeclarationOfFrienship",
                             jsonString
                         )
                         val jsonObject = Json.parseToJsonElement(postRequestResult)
@@ -362,7 +362,7 @@ object NextTurnAutomation {
         var flag = 1
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING){
             val jsonString: String
-            if (DebugUtils.NEED_GameInfo){
+            if (DebugUtils.NEED_GAMEINFO){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                 val contentData = ContentDataV4(content, civInfo.civName,civInfo.civName,"choose_technology")
                 jsonString = Json.encodeToString(contentData)
@@ -374,7 +374,7 @@ object NextTurnAutomation {
                 jsonString = Json.encodeToString(contentData)
             }
             try {
-                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: String? =

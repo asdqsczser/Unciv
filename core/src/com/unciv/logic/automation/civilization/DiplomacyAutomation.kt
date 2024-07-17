@@ -55,7 +55,7 @@ object DiplomacyAutomation {
             var jsonString: String
             var flag = 1
             if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-                if (DebugUtils.NEED_GameInfo){
+                if (DebugUtils.NEED_GAMEINFO){
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"change_closeness")
                     jsonString = Json.encodeToString(contentData)
@@ -68,7 +68,7 @@ object DiplomacyAutomation {
                 }
 //                 val postRequestResult = sendPostRequest("http://127.0.0.1:2337/wantsToSignDeclarationOfFrienship", jsonString)
                 try{
-                    val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                    val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -240,7 +240,7 @@ object DiplomacyAutomation {
             //random随机符合
             var flag = 1
             if(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-                if (DebugUtils.NEED_GameInfo) {
+                if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                     val contentData = ContentDataV4(content, civInfo.civName, otherCiv.civName, "open_borders")
                     jsonString = Json.encodeToString(contentData)
@@ -252,7 +252,7 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 try {
-                    val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                    val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -407,7 +407,7 @@ object DiplomacyAutomation {
             var flag = 1
             if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
 //                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
-                if (DebugUtils.NEED_GameInfo) {
+                if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                     val contentData = ContentDataV4(content, civInfo.civName, otherCiv.civName, "form_ally")
                     jsonString = Json.encodeToString(contentData)
@@ -419,7 +419,7 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 try {
-                    val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                    val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -601,7 +601,7 @@ object DiplomacyAutomation {
 //             var max_name = ""
 //             var max_score = 0
             for ( city in enemyCivs){
-                if (DebugUtils.NEED_GameInfo) {
+                if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                     val contentData = ContentDataV4(content, civInfo.civName, city.civName, "declare_war")
                     jsonString = Json.encodeToString(contentData)
@@ -613,7 +613,7 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 try {
-                    val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"decision",jsonString)
+                    val postRequestResult= sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision",jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -975,7 +975,7 @@ object DiplomacyAutomation {
         for (enemy in enemiesCiv) {
             if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
 //                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
-                if (DebugUtils.NEED_GameInfo) {
+                if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                     val contentData = ContentDataV4(content, civInfo.civName, enemy.civName, "seek_peace")
                     jsonString = Json.encodeToString(contentData)
@@ -987,7 +987,7 @@ object DiplomacyAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 try {
-                    val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"decision",jsonString)
+                    val postRequestResult= sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision",jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -1070,7 +1070,7 @@ data class ContentDataUnit(val gameinfo: String, val civ1: String, val id:String
 
 fun sendcanSignResearchAgreementsWith(content:String,civInfo1: Civilization,civInfo2: Civilization): Boolean? {
         val jsonString: String
-        if (DebugUtils.NEED_GameInfo) {
+        if (DebugUtils.NEED_GAMEINFO) {
             val gameinfo = UncivFiles.gameInfoToString(civInfo1.gameInfo,false,false)
             val contentData = ContentDataV4(gameinfo, civInfo1.civName, civInfo2.civName, content)
             jsonString = Json.encodeToString(contentData)
@@ -1082,7 +1082,7 @@ fun sendcanSignResearchAgreementsWith(content:String,civInfo1: Civilization,civI
             jsonString = Json.encodeToString(contentData)
         }
 //         val jsonString = Json.encodeToString(contentData)
-        val postRequestResult= sendPostRequest(DebugUtils.AI_Server_Address+"decision",jsonString)
+        val postRequestResult= sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision",jsonString)
         val jsonObject = Json.parseToJsonElement(postRequestResult)
         val resultElement = jsonObject.jsonObject["result"]
         val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {

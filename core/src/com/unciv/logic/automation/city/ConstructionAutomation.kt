@@ -3,7 +3,6 @@ package com.unciv.logic.automation.city
 import com.unciv.GUI
 import com.unciv.logic.automation.Automation
 import com.unciv.logic.automation.civilization.ContentDataV4
-import com.unciv.logic.automation.civilization.ContentDataV3
 import com.unciv.logic.automation.civilization.GameId
 import com.unciv.logic.automation.civilization.NextTurnAutomation
 import com.unciv.logic.automation.civilization.sendPostRequest
@@ -98,21 +97,19 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
         var flag = 1
         if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING) {
             val jsonString: String
-            if (DebugUtils.NEED_GameInfo){
+            if (DebugUtils.NEED_GAMEINFO){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
-                val contentData =
-                    ContentDataV4(content,civInfo.civName, city.name,"production_priority")
+                val contentData = ContentDataV4(content, civInfo.civName, city.name, "production_priority")
                 jsonString = Json.encodeToString(contentData)
             }
             else {
                 val gameid = GameId(civInfo.gameInfo.gameId)
                 val gameid_json = Json.encodeToString(gameid)
-                val contentData =
-                    ContentDataV4(gameid_json,civInfo.civName, city.name,"production_priority")
+                val contentData = ContentDataV4(gameid_json, civInfo.civName, city.name, "production_priority")
                 jsonString = Json.encodeToString(contentData)
             }
             try {
-                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val resultValue: String? =
@@ -212,12 +209,12 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             .filterBuildable()
             .map { it.name }.joinToString(", ")
 
-        val Militaryunit = units
+        val militaryUnit = units
             .filter { it.isMilitary() }
             .filterBuildable()
             .map { it.name }.joinToString(", ")
 
-        val allConstructionOptions = listOf(buildingNames, unitNames, nonWonderNames, wonderNames, Militaryunit)
+        val allConstructionOptions = listOf(buildingNames, unitNames, nonWonderNames, wonderNames, militaryUnit)
             .filter { it.isNotEmpty() }
             .joinToString(", ")
 

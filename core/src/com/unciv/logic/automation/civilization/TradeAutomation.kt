@@ -45,7 +45,7 @@ object TradeAutomation {
             var flag = 1
             if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
                 var jsonString: String
-                if(DebugUtils.NEED_GameInfo){
+                if(DebugUtils.NEED_GAMEINFO){
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
                     jsonString = Json.encodeToString(contentData)
                 }
@@ -54,7 +54,7 @@ object TradeAutomation {
                     jsonString = Json.encodeToString(contentData)
                 }
                 try {
-                    val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"reply_trade", jsonString)
+                    val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"reply_trade", jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
@@ -219,7 +219,7 @@ object TradeAutomation {
 //          val tradeLogic = TradeLogic(civInfo, otherCivInfo)
          val jsonString: String
          if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
-             if (DebugUtils.NEED_GameInfo) {
+             if (DebugUtils.NEED_GAMEINFO) {
                  val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                  val contentData = ContentDataV4(gameinfo, civInfo.civName,civInfo.civName,"common_enemy")
                  jsonString = Json.encodeToString(contentData)
@@ -231,14 +231,14 @@ object TradeAutomation {
              }
              try {
                  val postRequestResult =
-                     sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                     sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                  val jsonObject = Json.parseToJsonElement(postRequestResult)
                  val resultElement = jsonObject.jsonObject["result"]
                  val resultValue: Boolean? =
                      if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                         resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                         resultElement.contentOrNull!!.toBoolean()
                      } else {
-                         null // 处理 "result" 不是布尔值或字段不存在的情况
+                         null
                      }
                  if (resultValue == true) {
                      val tocivElement = jsonObject.jsonObject["to_civ"]?.jsonPrimitive?.content
@@ -246,7 +246,6 @@ object TradeAutomation {
                      val trade = Trade()
                      val otherCiv = civInfo.gameInfo.getCivilization(tocivElement!!)
                      val enemyCiv = civInfo.gameInfo.getCivilization(enemycivElement!!)
-                     //如果已经在交战中则不需要再次宣战
                      if (civInfo.isAtWarWith(enemyCiv)) {
                          val theiroffer =
                              TradeOffer(name = enemycivElement, type = TradeType.WarDeclaration)
@@ -303,7 +302,7 @@ object TradeAutomation {
         var jsonString : String
         var flag = 1
         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
-            if (DebugUtils.NEED_GameInfo) {
+            if (DebugUtils.NEED_GAMEINFO) {
                 val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                 val contentData = ContentDataV4(gameinfo, civInfo.civName, otherCivInfo.civName, "buy_luxury")
                 jsonString = Json.encodeToString(contentData)
@@ -315,15 +314,15 @@ object TradeAutomation {
                 jsonString = Json.encodeToString(contentData)
             }
             try {
-                val postRequestResult = sendPostRequest(DebugUtils.AI_Server_Address+"decision", jsonString)
+                val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                 val jsonObject = Json.parseToJsonElement(postRequestResult)
                 val resultElement = jsonObject.jsonObject["result"]
                 val goldElement = jsonObject.jsonObject["gold"]?.jsonPrimitive?.intOrNull
                 val luxuryElement = jsonObject.jsonObject["luxury"]?.jsonPrimitive?.content
                 val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                    resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                    resultElement.contentOrNull!!.toBoolean()
                 } else {
-                    null // 处理 "result" 不是布尔值或字段不存在的情况
+                    null
                 }
                 val trades = ArrayList<Trade>()
                 if(resultValue == true){
