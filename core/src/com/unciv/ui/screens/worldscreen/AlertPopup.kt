@@ -338,7 +338,7 @@ class AlertPopup(
 
 
     private fun addStartGame() {
-        addGoodSizedLabel("开始开始")
+        addGoodSizedLabel("Let's begin!")
         addCloseButton("Let's begin!")
     }
 

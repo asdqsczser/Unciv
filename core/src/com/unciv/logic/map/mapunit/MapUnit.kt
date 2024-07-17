@@ -124,8 +124,8 @@ class MapUnit : IsPartOfGameInfoSerialization {
 
     var religion: String? = null
     var religiousStrengthLost = 0
-    var NumOfWokerUse: Int = 0//工人的使用次数
-    var wokeruseing:Int = 0 //工人剩余使用回合数
+    var NumOfWokerUse: Int = 0
+    var wokeruseing:Int = 0
     /**
      * Container class to represent a single instant in a [MapUnit]'s recent movement history.
      *
@@ -578,7 +578,6 @@ class MapUnit : IsPartOfGameInfoSerialization {
     /** Returns the health points [MapUnit] will receive if healing on [tile] */
     fun rankTileForHealing(tile: Tile): Int {
         val isFriendlyTerritory = tile.isFriendlyTerritory(civ)
-        //城市内+10  国境内+3  国境外不加血
         var healing = when {
             tile.isCityCenter() -> 10 //20->10
             tile.isWater && isFriendlyTerritory && (baseUnit.isWaterUnit() || isTransported) -> 3 // Water unit on friendly water

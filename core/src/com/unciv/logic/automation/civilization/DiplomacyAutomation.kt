@@ -41,17 +41,16 @@ import java.net.URL
 object DiplomacyAutomation {
 
     /**
-     * 提议外交建立友好关系，根据能够建交的城市，按照其relationshipLevel降序排列
+     * Proposed diplomacy to establish friendly relations, according to the city that can establish diplomatic relations, in descending order of their relative value
      */
     internal fun offerDeclarationOfFriendship(civInfo: Civilization,post: Boolean=true) {
-        val civsThatWeCanDeclareFriendshipWith = civInfo.getKnownCivs()//获取已知文明
+        val civsThatWeCanDeclareFriendshipWith = civInfo.getKnownCivs()
             .filter { civInfo.diplomacyFunctions.canSignDeclarationOfFriendshipWith(it)
                 && !civInfo.getDiplomacyManager(it).hasFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship)}
             .sortedByDescending { it.getDiplomacyManager(civInfo).relationshipLevel() }.toList()
 //         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
         for (otherCiv in civsThatWeCanDeclareFriendshipWith) {
             // Default setting is 2, this will be changed according to different civ.
-            //random随机符合
             var jsonString: String
             var flag = 1
             if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
@@ -66,15 +65,14 @@ object DiplomacyAutomation {
                     val contentData = ContentDataV4(gameid_json, civInfo.civName,otherCiv.civName,"change_closeness")
                     jsonString = Json.encodeToString(contentData)
                 }
-//                 val postRequestResult = sendPostRequest("http://127.0.0.1:2337/wantsToSignDeclarationOfFrienship", jsonString)
                 try{
                     val postRequestResult = sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"decision", jsonString)
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                        resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                        resultElement.contentOrNull!!.toBoolean()
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
                     if (resultValue == true) {
                         otherCiv.popupAlerts.add(PopupAlert(AlertType.DeclarationOfFriendship, civInfo.civName))
@@ -95,12 +93,11 @@ object DiplomacyAutomation {
     }
 
     /**
-     * 尝试去建交，通过一系列的评估方式，确定motivation的值，如果大于0则返回true。
+     * Try to establish a relationship. Determine the value of motivation through a series of evaluation methods, and return true if it is greater than 0.
      */
     internal fun wantsToSignDeclarationOfFrienship(civInfo: Civilization, otherCiv: Civilization): Boolean {
         val diploManager = civInfo.getDiplomacyManager(otherCiv)
         // Shortcut, if it is below favorable then don't consider it
-        //如果该城市的有利程度不够，则不考虑
         if (diploManager.isRelationshipLevelLT(RelationshipLevel.Favorable)) return false
 
         val numOfFriends = civInfo.diplomacy.count { it.value.hasFlag(DiplomacyFlags.DeclarationOfFriendship) }
@@ -110,8 +107,7 @@ object DiplomacyAutomation {
         val allAliveCivs = allCivs - deadCivs
 
         // Motivation should be constant as the number of civs changes
-        //动机一直不随文明数量而变
-        var motivation = diploManager.opinionOfOtherCiv().toInt() - 40//减40数值
+        var motivation = diploManager.opinionOfOtherCiv().toInt() - 40
 
         // If the other civ is stronger than we are compelled to be nice to them
         // If they are too weak, then thier friendship doesn't mean much to us
@@ -123,22 +119,19 @@ object DiplomacyAutomation {
         }
 
         // Try to ally with a fourth of the civs in play
-        //尽量与1/4存活的国家建交。
         val civsToAllyWith = 0.25f * allAliveCivs
 
-        if (numOfFriends < civsToAllyWith) {//当自己的朋友少于我们的目标数时
-            // Goes from 10 to 0 once the civ gets 1/4 of all alive civs as friends 当一个文明获得了1/4存活文明的朋友时，这个文明从10变成0
+        if (numOfFriends < civsToAllyWith) {
+            // Goes from 10 to 0 once the civ gets 1/4 of all alive civs as friends
             motivation += (10 - 10 * (numOfFriends / civsToAllyWith)).toInt()
         } else {
             // Goes form 0 to -120 as the civ gets more friends, offset by civsToAllyWith
-            //朋友过多了，减少动机
             motivation -= (120f * (numOfFriends - civsToAllyWith) / (knownCivs - civsToAllyWith)).toInt()
         }
 
         // Goes from 0 to -50 as more civs die
         // this is meant to prevent the game from stalemating when a group of friends
         // conquers all oposition
-        //就是为了防止游戏进程后期友军过多。
         motivation -= deadCivs / allCivs * 50
 
         // Wait to declare frienships until more civs
@@ -155,7 +148,6 @@ object DiplomacyAutomation {
         val reason_reject = mutableListOf<String>()
         val diploManager = civInfo.getDiplomacyManager(otherCiv)
         // Shortcut, if it is below favorable then don't consider it
-        //如果该城市的有利程度不够，则不考虑
         if (diploManager.isRelationshipLevelLT(RelationshipLevel.Favorable)){
             reason_reject.add("To our disadvantage")
 //             return reason_reject
@@ -168,8 +160,7 @@ object DiplomacyAutomation {
         val allAliveCivs = allCivs - deadCivs
 
         // Motivation should be constant as the number of civs changes
-        //动机一直不随文明数量而变
-        var motivation = diploManager.opinionOfOtherCiv().toInt() - 40 //减40数值
+        var motivation = diploManager.opinionOfOtherCiv().toInt() - 40
 
         // If the other civ is stronger than we are compelled to be nice to them
         // If they are too weak, then thier friendship doesn't mean much to us
@@ -187,16 +178,14 @@ object DiplomacyAutomation {
         }
 
         // Try to ally with a fourth of the civs in play
-        //尽量与1/4存活的国家建交。
         val civsToAllyWith = 0.25f * allAliveCivs
 
-        if (numOfFriends < civsToAllyWith) {//当自己的朋友少于我们的目标数时
-            // Goes from 10 to 0 once the civ gets 1/4 of all alive civs as friends 当一个文明获得了1/4存活文明的朋友时，这个文明从10变成0
+        if (numOfFriends < civsToAllyWith) {
+            // Goes from 10 to 0 once the civ gets 1/4 of all alive civs as friends
             reason_consent.add("Need to make more friends")
             motivation += (10 - 10 * (numOfFriends / civsToAllyWith)).toInt()
         } else {
             // Goes form 0 to -120 as the civ gets more friends, offset by civsToAllyWith
-            //朋友过多了，减少动机
             reason_reject.add("I've made too many friends")
             motivation -= (120f * (numOfFriends - civsToAllyWith) / (knownCivs - civsToAllyWith)).toInt()
         }
@@ -204,7 +193,6 @@ object DiplomacyAutomation {
         // Goes from 0 to -50 as more civs die
         // this is meant to prevent the game from stalemating when a group of friends
         // conquers all oposition
-        // 就是为了防止游戏进程后期友军过多。
         reason_reject.add("There are too many friendly forces")
         motivation -= deadCivs / allCivs * 50
 
@@ -223,13 +211,13 @@ object DiplomacyAutomation {
         else return Pair(false,reasonsDict)
     }
     /**
-     *  提议开放边界，根据能够开放的城市，按照其relationshipLevel降序排列
+     *  Open borders are proposed, in descending order of their relationshipLevel, according to the cities that can be opened
      */
     internal fun offerOpenBorders(civInfo: Civilization,post: Boolean=true) {
         if (!civInfo.hasUnique(UniqueType.EnablesOpenBorders)) return
         val civsThatWeCanOpenBordersWith = civInfo.getKnownCivs()
-            .filter { it.isMajorCiv() && !civInfo.isAtWarWith(it)//不在战争
-                && it.hasUnique(UniqueType.EnablesOpenBorders)//能够开放
+            .filter { it.isMajorCiv() && !civInfo.isAtWarWith(it)
+                && it.hasUnique(UniqueType.EnablesOpenBorders)
                 && !civInfo.getDiplomacyManager(it).hasOpenBorders
                 && !civInfo.getDiplomacyManager(it).hasFlag(DiplomacyFlags.DeclinedOpenBorders) }
             .sortedByDescending { it.getDiplomacyManager(civInfo).relationshipLevel() }.toList()
@@ -237,7 +225,6 @@ object DiplomacyAutomation {
         var jsonString: String
         for (otherCiv in civsThatWeCanOpenBordersWith) {
             // Default setting is 3, this will be changed according to different civ.
-            //random随机符合
             var flag = 1
             if(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
                 if (DebugUtils.NEED_GAMEINFO) {
@@ -256,9 +243,9 @@ object DiplomacyAutomation {
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                        resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                        resultElement.contentOrNull!!.toBoolean()
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
                     if ( resultValue==true) {
 
@@ -288,7 +275,7 @@ object DiplomacyAutomation {
     }
 
     /**
-     * 尝试去开放边界，根据几个条件判断是否合适，如合适则返回true。
+     * Try opening the boundary, depending on a few criteria, and return true if it is appropriate.
      */
     fun wantsToOpenBorders(civInfo: Civilization, otherCiv: Civilization): Boolean {
         if (civInfo.getDiplomacyManager(otherCiv).isRelationshipLevelLT(RelationshipLevel.Favorable)) return false
@@ -338,7 +325,7 @@ object DiplomacyAutomation {
     }
 
     /**
-     * 提议研究协定。。
+     * Proposed to study the agreement.
      */
     internal fun offerResearchAgreement(civInfo: Civilization,post: Boolean=true) {
         if (!civInfo.diplomacyFunctions.canSignResearchAgreement()) return // don't waste your time
@@ -390,7 +377,7 @@ object DiplomacyAutomation {
     }
 
     /**
-     * 提出防御协定，
+     * Put forward a defense pact,
      */
     internal fun offerDefensivePact(civInfo: Civilization,post: Boolean=true) {
         if (!civInfo.diplomacyFunctions.canSignDefensivePact()) return // don't waste your time
@@ -423,9 +410,9 @@ object DiplomacyAutomation {
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                        resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                        resultElement.contentOrNull!!.toBoolean()
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
                     if (resultValue == true) {
                         val tradeLogic = TradeLogic(civInfo, otherCiv)
@@ -453,9 +440,7 @@ object DiplomacyAutomation {
         }
     }
 
-    /**
-     * 与尝试建交类似，通过一系列评估方法，确定motivation的值，大于0则返回true
-     */
+
     fun wantsToSignDefensivePact(civInfo: Civilization, otherCiv: Civilization): Boolean {
         val diploManager = civInfo.getDiplomacyManager(otherCiv)
         if (diploManager.isRelationshipLevelLT(RelationshipLevel.Ally)) return false
@@ -564,9 +549,7 @@ object DiplomacyAutomation {
         else return Pair(false,reasonsDict)
     }
 
-    /**
-     * 通过一定的规则，ai去挑选motivation最大的城市发起战争，其中避免了ai过早发起战争。
-     */
+
     internal fun declareWar(civInfo: Civilization,post: Boolean = true) {
 //         if (civInfo.wantsToFocusOn(Victory.Focus.Culture)) return
         if (civInfo.cities.isEmpty() || civInfo.diplomacy.isEmpty()) return
@@ -617,9 +600,9 @@ object DiplomacyAutomation {
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                        resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                        resultElement.contentOrNull!!.toBoolean()
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
                     if (resultValue == true) {
                         civInfo.getDiplomacyManager(city.civName).declareWar()
@@ -657,7 +640,6 @@ object DiplomacyAutomation {
         val closestCities = NextTurnAutomation.getClosestCities(civInfo, otherCiv) ?: return 0
         val baseForce = 30f
 
-        //敌我战斗力
         var ourCombatStrength = civInfo.getStatForRanking(RankingType.Force).toFloat() + baseForce
         if (civInfo.getCapital() != null) ourCombatStrength += CityCombatant(civInfo.getCapital()!!).getCityStrength()
         var theirCombatStrength = otherCiv.getStatForRanking(RankingType.Force).toFloat() + baseForce
@@ -680,7 +662,7 @@ object DiplomacyAutomation {
                         MapUnitCombatant(it),
                         CityCombatant(theirCity)
                     )
-                damageReceivedWhenAttacking < 100 //如果小于100，说明该单位没阵亡
+                damageReceivedWhenAttacking < 100
             })
             return 0 // You don't have any units that can attack this city without dying, don't declare war.
 
@@ -785,7 +767,7 @@ object DiplomacyAutomation {
         }
         val baseForce = 30f
 
-        //敌我战斗力
+
         var ourCombatStrength = civInfo.getStatForRanking(RankingType.Force).toFloat() + baseForce
         if (civInfo.getCapital() != null) ourCombatStrength += CityCombatant(civInfo.getCapital()!!).getCityStrength()
         var theirCombatStrength = otherCiv.getStatForRanking(RankingType.Force).toFloat() + baseForce
@@ -812,7 +794,7 @@ object DiplomacyAutomation {
                         MapUnitCombatant(it),
                         CityCombatant(theirCity)
                     )
-                damageReceivedWhenAttacking < 100 //如果小于100，说明该单位没阵亡
+                damageReceivedWhenAttacking < 100
             })
         {
             reason_reject.add("Our sacrifice will be heavy")
@@ -955,9 +937,7 @@ object DiplomacyAutomation {
 
         return Pair(true,reasonsDict)
     }
-    /**
-     * 提出和平协议，通过一定规则去判断，当motivation依旧大于10时会有拒绝的情况。。。
-     */
+
     internal fun offerPeaceTreaty(civInfo: Civilization,post: Boolean = true) {
         if (!civInfo.isAtWar() || civInfo.cities.isEmpty() || civInfo.diplomacy.isEmpty()) return
 
@@ -991,9 +971,9 @@ object DiplomacyAutomation {
                     val jsonObject = Json.parseToJsonElement(postRequestResult)
                     val resultElement = jsonObject.jsonObject["result"]
                     val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-                        resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+                        resultElement.contentOrNull!!.toBoolean()
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
 //                 val score = postRequestResult.toInt()
 //             if(hasAtLeastMotivationToAttack(civInfo, enemy, 10) >= 10) {
@@ -1018,7 +998,7 @@ object DiplomacyAutomation {
             tradeLogic.currentTrade.ourOffers.add(TradeOffer(Constants.peaceTreaty, TradeType.Treaty))
             tradeLogic.currentTrade.theirOffers.add(TradeOffer(Constants.peaceTreaty, TradeType.Treaty))
 
-            var moneyWeNeedToPay = -TradeEvaluation().evaluatePeaceCostForThem(civInfo, enemy)//赔钱评估
+            var moneyWeNeedToPay = -TradeEvaluation().evaluatePeaceCostForThem(civInfo, enemy)
 
             if (civInfo.gold > 0 && moneyWeNeedToPay > 0) {
                 if (moneyWeNeedToPay > civInfo.gold) {
@@ -1034,7 +1014,7 @@ object DiplomacyAutomation {
     }
 
 }
-// 发送 POST 请求
+
 fun sendPostRequest(url: String, postData: String): String {
     val aiUrl = URL(url)
     val connection = aiUrl.openConnection() as HttpURLConnection
@@ -1086,9 +1066,9 @@ fun sendcanSignResearchAgreementsWith(content:String,civInfo1: Civilization,civI
         val jsonObject = Json.parseToJsonElement(postRequestResult)
         val resultElement = jsonObject.jsonObject["result"]
         val resultValue: Boolean? = if (resultElement is JsonPrimitive && resultElement.contentOrNull != null) {
-            resultElement.contentOrNull!!.toBoolean() // 尝试将内容转换为布尔值
+            resultElement.contentOrNull!!.toBoolean()
         } else {
-            null // 处理 "result" 不是布尔值或字段不存在的情况
+            null
         }
         return resultValue
 }

@@ -43,27 +43,27 @@ object DebugUtils {
         if (args.isEmpty()) return
         for (arg in args) {
             val (key, value) = arg.split("=")
-            if (key == "NEED_POST") {
+            if (key.lowercase() == "NEED_POST".lowercase()) {
                 NEED_POST = value.toBoolean()
-            } else if (key == "NEED_GAMEINFO") {
+            } else if (key.lowercase() == "NEED_GAMEINFO".lowercase()) {
                 NEED_GAMEINFO = value.toBoolean()
-            } else if (key == "ACTIVE_DIPLOMACY") {
+            } else if (key.lowercase() == "ACTIVE_DIPLOMACY".lowercase()) {
                 ACTIVE_DIPLOMACY = value.toBoolean()
-            } else if (key == "AI_SERVER_ADDRESS") {
+            } else if (key.lowercase() == "AI_SERVER_ADDRESS".lowercase()) {
                 AI_SERVER_ADDRESS = value
-            } else if (key == "SIMULATE_UNTIL_TURN") {
+            } else if (key.lowercase() == "SIMULATE_UNTIL_TURN".lowercase()) {
                 SIMULATE_UNTIL_TURN = value.toInt()
-            } else if (key == "SIMULATEING") {
+            } else if (key.lowercase() == "SIMULATEING".lowercase()) {
                 SIMULATEING = value.toBoolean()
-            } else if (key == "SUPERCHARGED") {
+            } else if (key.lowercase() == "SUPERCHARGED".lowercase()) {
                 SUPERCHARGED = value.toBoolean()
-            } else if (key == "SHOW_TILE_COORDS") {
+            } else if (key.lowercase() == "SHOW_TILE_COORDS".lowercase()) {
                 SHOW_TILE_COORDS = value.toBoolean()
-            } else if (key == "VISIBLE_MAP") {
+            } else if (key.lowercase() == "VISIBLE_MAP".lowercase()) {
                 VISIBLE_MAP = value.toBoolean()
-            } else if (key == "LLM_API_KEY") {
+            } else if (key.lowercase() == "LLM_API_KEY".lowercase()) {
                 LLM_API_KEY = value
-            } else if (key == "LLM_MODEL") {
+            } else if (key.lowercase() == "LLM_MODEL".lowercase()) {
                 LLM_MODEL = value
             }
         }

@@ -28,7 +28,7 @@ class TileStatFunctions(val tile: Tile) {
 
         if (city != null) {
             val statsFromTilesUniques =
-                    localUniqueCache.forCityGetMatchingUniques(//消耗大
+                    localUniqueCache.forCityGetMatchingUniques(
                             city, UniqueType.StatsFromTiles,
                         stateForConditionals)
                         .filter { city.matchesFilter(it.params[2]) }
@@ -61,7 +61,7 @@ class TileStatFunctions(val tile: Tile) {
 
             val improvement = tile.getUnpillagedTileImprovement()
             if (improvement != null)
-                stats.add(getImprovementStats(improvement, observingCiv, city, localUniqueCache))//消耗大
+                stats.add(getImprovementStats(improvement, observingCiv, city, localUniqueCache))
 
             if (stats.gold != 0f && observingCiv.goldenAges.isGoldenAge())
                 stats.gold++

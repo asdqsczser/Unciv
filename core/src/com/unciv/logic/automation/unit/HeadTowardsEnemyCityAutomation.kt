@@ -76,9 +76,8 @@ object HeadTowardsEnemyCityAutomation {
         }
         return "None"
     }
-    /**
-     * 得到攻打敌人城市的优先级
-     */
+
+
     private fun getEnemyCitiesByPriority(unit: MapUnit):Sequence<City>{
         val enemies = unit.civ.getKnownCivs()
             .filter { unit.civ.isAtWarWith(it) && it.cities.isNotEmpty() }
@@ -158,9 +157,6 @@ object HeadTowardsEnemyCityAutomation {
                 || city.health / (expectedDamagePerTurn - cityHealingPerTurn) > 5) // Can damage, but will take more than 5 turns
     }
 
-    /**
-     * 让自己单位先到离敌方城市中心3-5距离敌方着陆
-     */
     private fun headToLandingGrounds(closestReachableEnemyCity: Tile, unit: MapUnit): Boolean {
         // don't head straight to the city, try to head to landing grounds -
         // this is against tha AI's brilliant plan of having everyone embarked and attacking via sea when unnecessary.
@@ -175,9 +171,7 @@ object HeadTowardsEnemyCityAutomation {
         return true
     }
 
-    /**
-     * 让远程单位走在安全的敌方
-     */
+
     private fun headTowardsEnemyCityLongRange(
         closestReachableEnemyCity: Tile,
         unitDistanceToTiles: PathsToTilesWithinTurn,

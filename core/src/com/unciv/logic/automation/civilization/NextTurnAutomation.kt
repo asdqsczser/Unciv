@@ -102,18 +102,18 @@ object NextTurnAutomation {
         if (civInfo.isMajorCiv()) {
             if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
                 if (Diplomacy_flag) {
-                    DiplomacyAutomation.declareWar(civInfo,post)//发起战争
+                    DiplomacyAutomation.declareWar(civInfo,post)
                 }
-                DiplomacyAutomation.offerPeaceTreaty(civInfo,post)//和平协定
-                DiplomacyAutomation.offerDeclarationOfFriendship(civInfo,post)//声明友好
+                DiplomacyAutomation.offerPeaceTreaty(civInfo,post)
+                DiplomacyAutomation.offerDeclarationOfFriendship(civInfo,post)
             }
             if (civInfo.gameInfo.isReligionEnabled()) {
                 ReligionAutomation.spendFaithOnReligion(civInfo)
             }
-            DiplomacyAutomation.offerOpenBorders(civInfo,post)//保留开放边境
+            DiplomacyAutomation.offerOpenBorders(civInfo,post)
             if (Diplomacy_flag) {
-                DiplomacyAutomation.offerResearchAgreement(civInfo,post)//研究协定
-                DiplomacyAutomation.offerDefensivePact(civInfo,post)//防御协定
+                DiplomacyAutomation.offerResearchAgreement(civInfo,post)
+                DiplomacyAutomation.offerDefensivePact(civInfo,post)
             }
             TradeAutomation.exchangeLuxuries(civInfo)
             issueRequests(civInfo)
@@ -159,7 +159,7 @@ object NextTurnAutomation {
     }
     private fun respondToPopupAlerts(civInfo: Civilization) {
         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
-        ///该回合请求使用哪几种技能
+
         try {
             if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
                 val contentData = ContentDataV2(content, civInfo.civName)
@@ -210,7 +210,7 @@ object NextTurnAutomation {
                                     resultElement.contentOrNull!!.toBoolean()
                                 }
                             } else {
-                                null // 处理 "result" 不是布尔值或字段不存在的情况
+                                null
                             }
                         if (resultValue == true) {
                             diploManager.signDeclarationOfFriendship()

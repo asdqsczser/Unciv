@@ -343,9 +343,9 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
 
         var player = currentPlayerCiv
         var playerIndex = civilizations.indexOf(player)
-        var humanid= 0//记录人类id
+        var humanid= 0
         var newturns = 0
-        var flag=0//计数标志
+        var flag=0
         // We rotate Players in cycle: 1,2...N,1,2...
         fun setNextPlayer() {
             playerIndex = (playerIndex + 1) % civilizations.size
@@ -358,7 +358,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
             player = civilizations[playerIndex]
         }
 
-        if (player.isHuman()) {// 记录下人类玩家的序号，并将其给ai托管。
+        if (player.isHuman()) {
             humanid=playerIndex
             player.playerType=PlayerType.AI
             flag=1
@@ -375,7 +375,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 player.isSpectator())
         )      // or player is online spectator
         {
-            if(playerIndex==humanid){//这里是循环SIMULATE_UNTIL_TURN的关键，每轮循环到人类id时，技数+1，循环结束时推出。
+            if(playerIndex==humanid){
                 if (flag==DebugUtils.SIMULATE_UNTIL_TURN)break
                 flag++
             }
@@ -395,7 +395,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         }
 
 //         }
-        player.playerType=PlayerType.Human//恢复人类玩家身份，取消ai托管。
+        player.playerType=PlayerType.Human
 //         if (turns == DebugUtils.SIMULATE_UNTIL_TURN)
 //             DebugUtils.SIMULATE_UNTIL_TURN = 0
 
@@ -429,9 +429,9 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         DebugUtils.SIMULATE_UNTIL_TURN=PreTurns
         var player = currentPlayerCiv
         var playerIndex = civilizations.indexOf(player)
-        var humanid= 0//记录人类id
+        var humanid= 0
         var newturns = 0
-        var flag=0//计数标志
+        var flag=0
         // We rotate Players in cycle: 1,2...N,1,2...
         fun setNextPlayer() {
             playerIndex = (playerIndex + 1) % civilizations.size
@@ -444,7 +444,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
             player = civilizations[playerIndex]
         }
 
-        if (player.isHuman()) {// 记录下人类玩家的序号，并将其给ai托管。
+        if (player.isHuman()) {
             humanid=playerIndex
             player.playerType=PlayerType.AI
             flag=1
@@ -461,7 +461,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
                 player.isSpectator())
         )      // or player is online spectator
         {
-            if(playerIndex==humanid){//这里是循环SIMULATE_UNTIL_TURN的关键，每轮循环到人类id时，技数+1，循环结束时推出。
+            if(playerIndex==humanid){
                 if (flag==DebugUtils.SIMULATE_UNTIL_TURN)break
                 flag++
             }
@@ -481,7 +481,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         }
 
 //         }
-        player.playerType=PlayerType.Human//恢复人类玩家身份，取消ai托管。
+        player.playerType=PlayerType.Human
         if (turns == DebugUtils.SIMULATE_UNTIL_TURN)
             DebugUtils.SIMULATE_UNTIL_TURN = 0
 

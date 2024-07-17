@@ -16,25 +16,18 @@ import kotlin.math.max
 class DiplomacyFunctions(val civInfo: Civilization){
 
     /** A sorted Sequence of all other civs we know (excluding barbarians and spectators) */
-    /**
-     * 得到已知城市的排序
-     */
+
     fun getKnownCivsSorted(includeCityStates: Boolean = true, includeDefeated: Boolean = false) =
         civInfo.gameInfo.getCivsSorted(includeCityStates, includeDefeated) {
             it != civInfo && civInfo.knows(it)
         }
 
-    /**
-     * 制造文明的认识，调用meetCiv()
-     */
+
     fun makeCivilizationsMeet(otherCiv: Civilization, warOnContact: Boolean = false) {
         meetCiv(otherCiv, warOnContact)
         otherCiv.diplomacyFunctions.meetCiv(civInfo, warOnContact)
     }
 
-    /**
-     *遇到新文明后发生的一些事情，规则判断以及给钱给礼物等。
-     */
     private fun meetCiv(otherCiv: Civilization, warOnContact: Boolean = false) {
         civInfo.diplomacy[otherCiv.civName] = DiplomacyManager(civInfo, otherCiv.civName)
             .apply { diplomaticStatus = DiplomaticStatus.Peace }
@@ -82,9 +75,6 @@ class DiplomacyFunctions(val civInfo: Civilization){
         }
     }
 
-    /**
-     * 判断是否于其在战争，排除野蛮人与没遇到的情况
-     */
     fun isAtWarWith(otherCiv: Civilization): Boolean {
         return when {
             otherCiv == civInfo -> false
@@ -97,18 +87,14 @@ class DiplomacyFunctions(val civInfo: Civilization){
         }
     }
 
-    /**
-     * 判断是否能够与该城邦发起友好
-     */
+
     fun canSignDeclarationOfFriendshipWith(otherCiv: Civilization): Boolean {
         return otherCiv.isMajorCiv() && !otherCiv.isAtWarWith(civInfo)
             && !civInfo.getDiplomacyManager(otherCiv).hasFlag(DiplomacyFlags.Denunciation)
             && !civInfo.getDiplomacyManager(otherCiv).hasFlag(DiplomacyFlags.DeclarationOfFriendship)
     }
 
-    /**
-     * 判断是否能否发起研究协定
-     */
+
     fun canSignResearchAgreement(): Boolean {
         if (!civInfo.isMajorCiv()) return false
         if (!civInfo.hasUnique(UniqueType.EnablesResearchAgreements)) return false
@@ -118,9 +104,7 @@ class DiplomacyFunctions(val civInfo: Civilization){
     }
 
 
-    /**
-     * 判断是否可以不用花费进行研究协定
-     */
+
     fun canSignResearchAgreementNoCostWith (otherCiv: Civilization): Boolean {
         val diplomacyManager = civInfo.getDiplomacyManager(otherCiv)
         return canSignResearchAgreement() && otherCiv.diplomacyFunctions.canSignResearchAgreement()
@@ -129,9 +113,7 @@ class DiplomacyFunctions(val civInfo: Civilization){
             && !diplomacyManager.otherCivDiplomacy().hasFlag(DiplomacyFlags.ResearchAgreement)
     }
 
-    /**
-     * 能否与该城邦发起研究协议
-     */
+
     fun canSignResearchAgreementsWith(otherCiv: Civilization): Boolean {
         val cost = getResearchAgreementCost(otherCiv)
         return canSignResearchAgreementNoCostWith(otherCiv)
@@ -185,9 +167,7 @@ class DiplomacyFunctions(val civInfo: Civilization){
         else return Pair(true,reasonsDict)
     }
 
-    /**
-     * 得到研究协定的花费。
-     */
+
     fun getResearchAgreementCost(otherCiv: Civilization): Int {
         // https://forums.civfanatics.com/resources/research-agreements-bnw.25568/
         return ( max(civInfo.getEra().researchAgreementCost, otherCiv.getEra().researchAgreementCost)
@@ -195,18 +175,14 @@ class DiplomacyFunctions(val civInfo: Civilization){
             ).toInt()
     }
 
-    /**
-     * 判断自己能否提出防御协定
-     */
+
     fun canSignDefensivePact(): Boolean {
         if (!civInfo.isMajorCiv()) return false
         if (!civInfo.hasUnique(UniqueType.EnablesDefensivePacts)) return false
         return true
     }
 
-    /**
-     * 判断能否与该城邦签订防御协定
-     */
+
     fun canSignDefensivePactWith(otherCiv: Civilization): Boolean {
         val diplomacyManager = civInfo.getDiplomacyManager(otherCiv)
         return canSignDefensivePact() && otherCiv.diplomacyFunctions.canSignDefensivePact()
@@ -226,9 +202,7 @@ class DiplomacyFunctions(val civInfo: Civilization){
      * Use [UnitMovement.canPassThrough] to check whether a specific unit can pass through
      * a specific tile.
      */
-    /**
-     * 判断是否能过通过这个文明的Tiles
-     */
+
     fun canPassThroughTiles(otherCiv: Civilization): Boolean {
         if (otherCiv == civInfo) return true
         if (otherCiv.isBarbarian()) return true

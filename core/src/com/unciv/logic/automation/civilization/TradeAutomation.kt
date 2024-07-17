@@ -64,7 +64,7 @@ object TradeAutomation {
                             resultElement.contentOrNull!!.toBoolean()
                         }
                     } else {
-                        null // 处理 "result" 不是布尔值或字段不存在的情况
+                        null
                     }
                     if(resultValue == true){
                         tradeLogic.acceptTrade()
