@@ -108,6 +108,7 @@ class OnlineMultiplayerGame(
         val curPreview = if (preview != null) preview!! else loadPreviewFromFile()
         val serverIdentifier = curPreview.gameParameters.multiplayerServerUrl
         val newPreview = OnlineMultiplayerServer(serverIdentifier).tryDownloadGamePreview(curPreview.gameId)
+        // civsim: update the game environment by add currentTurnStartTime
         if (newPreview.turns == curPreview.turns && newPreview.currentTurnStartTime == curPreview.currentTurnStartTime && newPreview.currentPlayer == curPreview.currentPlayer) return GameUpdateResult(UNCHANGED, newPreview)
         UncivGame.Current.files.saveGame(newPreview, fileHandle)
         preview = newPreview

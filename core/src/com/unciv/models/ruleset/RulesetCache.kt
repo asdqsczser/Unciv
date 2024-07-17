@@ -29,7 +29,8 @@ object RulesetCache : HashMap<String, Ruleset>() {
     fun loadRulesets(consoleMode: Boolean = false, noMods: Boolean = false) :List<String> {
         val newRulesets = HashMap<String, Ruleset>()
         for (ruleset in BaseRuleset.values()) {
-//             val fileName = "jsons/Civ V - Gods & Kings"
+            // civsim: load the ruleset of civsim
+            //  val fileName = "jsons/Civ V - Gods & Kings"
             val fileName ="jsons/${ruleset.fullName}"
             val fileHandle =
                 if (consoleMode) FileHandle(fileName)

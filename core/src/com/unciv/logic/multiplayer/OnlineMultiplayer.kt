@@ -329,8 +329,7 @@ class OnlineMultiplayer {
      * Checks if [gameInfo] and [preview] are up-to-date with each other.
      */
     fun hasLatestGameState(gameInfo: GameInfo, preview: GameInfoPreview): Boolean {
-        // TODO look into how to maybe extract interfaces to not make this take two different methods
-
+        // civsim: whether to load the retrieved savefile
         return gameInfo.currentPlayer == preview.currentPlayer
             && gameInfo.currentTurnStartTime == preview.currentTurnStartTime
             && gameInfo.turns == preview.turns
