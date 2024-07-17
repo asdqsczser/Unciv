@@ -49,7 +49,7 @@ object DebugUtils {
                 NEED_GAMEINFO = value.toBoolean()
             } else if (key == "ACTIVE_DIPLOMACY") {
                 ACTIVE_DIPLOMACY = value.toBoolean()
-            } else if (key == "ACTIVE_DIPLOMACY") {
+            } else if (key == "AI_SERVER_ADDRESS") {
                 AI_SERVER_ADDRESS = value
             } else if (key == "SIMULATE_UNTIL_TURN") {
                 SIMULATE_UNTIL_TURN = value.toInt()
