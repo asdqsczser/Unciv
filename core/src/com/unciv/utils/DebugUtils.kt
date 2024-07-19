@@ -19,7 +19,7 @@ object DebugUtils {
      *  Does not update World View changes until finished.
      *  Set to 0 to disable.
      */
-    var SIMULATE_UNTIL_TURN: Int = 0
+    var SIMULATE_UNTIL_TURN: Int = 1
 
     /** Set it to true only when SIMULATE_UNTIL_TURN > 1 */
     var SIMULATEING: Boolean = false
