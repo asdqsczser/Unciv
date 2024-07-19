@@ -14,6 +14,7 @@ import com.unciv.logic.trade.TradeOffer
 import com.unciv.logic.trade.TradeRequest
 import com.unciv.logic.trade.TradeType
 import com.unciv.utils.DebugUtils
+import com.unciv.utils.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -74,7 +75,8 @@ object TradeAutomation {
                     }
                 }
                 catch (e: Exception){
-                    flag=0
+                    flag = 0
+                    Log.error("Fail:", e)
                 }
 
             }
@@ -266,7 +268,8 @@ object TradeAutomation {
                  }
              }
             catch (e: Exception){
-                println("error:e")
+                Log.error("Fail:", e)
+                println(e)
             }
          }
      }
@@ -342,6 +345,7 @@ object TradeAutomation {
             }
             catch (e: Exception){
                 flag = 0
+                Log.error("Fail:", e)
             }
 
         }

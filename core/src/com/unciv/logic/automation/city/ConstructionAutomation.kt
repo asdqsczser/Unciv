@@ -22,6 +22,7 @@ import com.unciv.models.ruleset.unique.StateForConditionals
 import com.unciv.models.ruleset.unique.UniqueType
 import com.unciv.models.stats.Stat
 import com.unciv.utils.DebugUtils
+import com.unciv.utils.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -125,6 +126,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             }
             catch (e: Exception){
                 flag = 0
+                Log.error("Fail:", e)
             }
 
         }

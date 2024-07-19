@@ -26,6 +26,7 @@ import com.unciv.models.ruleset.unit.BaseUnit
 import com.unciv.models.translations.tr
 import com.unciv.ui.screens.victoryscreen.RankingType
 import com.unciv.utils.DebugUtils
+import com.unciv.utils.Log
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -80,6 +81,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    Log.error("Fail:", e)
                 }
 
             }
@@ -258,6 +260,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    Log.error("Fail:", e)
                 }
 
             }
@@ -351,6 +354,7 @@ object DiplomacyAutomation {
             }
             catch (e: Exception) {
                 flag = 0
+                Log.error("Fail:", e)
             }
         }
         if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
@@ -424,6 +428,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    Log.error("Fail:", e)
                 }
             }
             if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
@@ -610,6 +615,7 @@ object DiplomacyAutomation {
                 }
                 catch(e: Exception){
                     flag = 0
+                    Log.error("Fail:", e)
                 }
 
 //                 val score = postRequestResult.toInt()
@@ -984,6 +990,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
+                    Log.error("Fail:", e)
                 }
             }
            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){

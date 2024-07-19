@@ -12,6 +12,7 @@ import com.unciv.logic.map.mapunit.MapUnit
 import com.unciv.logic.map.mapunit.movement.PathsToTilesWithinTurn
 import com.unciv.logic.map.tile.Tile
 import com.unciv.utils.DebugUtils
+import com.unciv.utils.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -43,6 +44,7 @@ object HeadTowardsEnemyCityAutomation {
             }
             catch (e:Exception){
                 flag = 0
+                Log.error("Fail:", e)
             }
         }
         if (!DebugUtils.NEED_POST||flag==0){

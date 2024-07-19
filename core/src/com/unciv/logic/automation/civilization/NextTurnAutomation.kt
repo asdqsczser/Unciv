@@ -28,6 +28,7 @@ import com.unciv.models.ruleset.unit.BaseUnit
 import com.unciv.models.stats.Stat
 import com.unciv.ui.screens.victoryscreen.RankingType
 import com.unciv.utils.DebugUtils
+import com.unciv.utils.Log
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
@@ -168,7 +169,8 @@ object NextTurnAutomation {
             }
         }
         catch (e: Exception) {
-            println("Error in respondToPopupAlerts")
+            Log.error("Fail:", e)
+            println(e)
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -233,6 +235,7 @@ object NextTurnAutomation {
                     }
                     catch (e: Exception) {
                         flag = 0
+                        Log.error("Fail:", e)
                     }
                 }
                 if (flag == 0 || !(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)) {
@@ -391,6 +394,7 @@ object NextTurnAutomation {
             }
             catch (e: Exception) {
                 flag = 0
+                Log.error("Fail:", e)
             }
         }
         if (flag == 0 || !(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)){
