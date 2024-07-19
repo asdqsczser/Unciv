@@ -81,7 +81,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error while offering a declaration of friendship", e)
                 }
 
             }
@@ -260,7 +260,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error while offering open borders", e)
                 }
 
             }
@@ -354,7 +354,7 @@ object DiplomacyAutomation {
             }
             catch (e: Exception) {
                 flag = 0
-                Log.error("Fail:", e)
+                Log.error("Error while offering research agreement", e)
             }
         }
         if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
@@ -428,7 +428,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error while offering a defensive pact", e)
                 }
             }
             if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
@@ -615,7 +615,7 @@ object DiplomacyAutomation {
                 }
                 catch(e: Exception){
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error while declaring War", e)
                 }
 
 //                 val score = postRequestResult.toInt()
@@ -990,7 +990,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error while offering a peace treaty", e)
                 }
             }
            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){

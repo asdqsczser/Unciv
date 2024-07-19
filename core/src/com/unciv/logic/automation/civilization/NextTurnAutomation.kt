@@ -169,7 +169,7 @@ object NextTurnAutomation {
             }
         }
         catch (e: Exception) {
-            Log.error("Fail:", e)
+            Log.error("Error while getting early decision", e)
             println(e)
         }
         ///
@@ -235,7 +235,7 @@ object NextTurnAutomation {
                     }
                     catch (e: Exception) {
                         flag = 0
-                        Log.error("Fail:", e)
+                        Log.error("Error while wanting to declare friendship", e)
                     }
                 }
                 if (flag == 0 || !(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)) {
@@ -394,7 +394,7 @@ object NextTurnAutomation {
             }
             catch (e: Exception) {
                 flag = 0
-                Log.error("Fail:", e)
+                Log.error("Error while getting early decision", e)
             }
         }
         if (flag == 0 || !(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)){

@@ -76,7 +76,7 @@ object TradeAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
-                    Log.error("Fail:", e)
+                    Log.error("Error occurred while replying to the trade", e)
                 }
 
             }
@@ -345,7 +345,7 @@ object TradeAutomation {
             }
             catch (e: Exception){
                 flag = 0
-                Log.error("Fail:", e)
+                Log.error("Error occurred while replying to the trade", e)
             }
 
         }

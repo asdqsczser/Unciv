@@ -126,7 +126,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             }
             catch (e: Exception){
                 flag = 0
-                Log.error("Fail:", e)
+                Log.error("Error while choosing next construction", e)
             }
 
         }

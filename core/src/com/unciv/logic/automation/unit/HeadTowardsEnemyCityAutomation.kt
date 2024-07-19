@@ -44,7 +44,7 @@ object HeadTowardsEnemyCityAutomation {
             }
             catch (e:Exception){
                 flag = 0
-                Log.error("Fail:", e)
+                Log.error("Error while getting enemy cities by priority", e)
             }
         }
         if (!DebugUtils.NEED_POST||flag==0){

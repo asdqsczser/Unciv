@@ -1,5 +1,5 @@
 package com.unciv.utils
-
+import com.unciv.utils.Log
 object DebugUtils {
 
     /**
@@ -42,7 +42,7 @@ object DebugUtils {
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
-            val (key, value) = arg.split("=")
+            var (key, value) = arg.split("=")
             if (key.lowercase() == "NEED_POST".lowercase()) {
                 NEED_POST = value.toBoolean()
             } else if (key.lowercase() == "NEED_GAMEINFO".lowercase()) {
@@ -50,6 +50,9 @@ object DebugUtils {
             } else if (key.lowercase() == "ACTIVE_DIPLOMACY".lowercase()) {
                 ACTIVE_DIPLOMACY = value.toBoolean()
             } else if (key.lowercase() == "AI_SERVER_ADDRESS".lowercase()) {
+                if ("http" !in value) {
+                    value = "http://$value"
+                }
                 AI_SERVER_ADDRESS = value
             } else if (key.lowercase() == "SIMULATE_UNTIL_TURN".lowercase()) {
                 SIMULATE_UNTIL_TURN = value.toInt()
@@ -67,5 +70,21 @@ object DebugUtils {
                 LLM_MODEL = value
             }
         }
+        Log.debug(
+            """
+            DebugUtils initialized with args:
+            "NEED_POST: $NEED_POST"
+            "NEED_GAMEINFO: $NEED_GAMEINFO"
+            "ACTIVE_DIPLOMACY: $ACTIVE_DIPLOMACY"
+            "AI_SERVER_ADDRESS: $AI_SERVER_ADDRESS"
+            "SIMULATE_UNTIL_TURN: $SIMULATE_UNTIL_TURN"
+            "SIMULATEING: $SIMULATEING"
+            "SUPERCHARGED: $SUPERCHARGED"
+            "SHOW_TILE_COORDS: $SHOW_TILE_COORDS"
+            "VISIBLE_MAP: $VISIBLE_MAP"
+            "LLM_API_KEY: $LLM_API_KEY"
+            "LLM_MODEL: $LLM_MODEL"
+            """.trimIndent()
+        )
     }
 }
