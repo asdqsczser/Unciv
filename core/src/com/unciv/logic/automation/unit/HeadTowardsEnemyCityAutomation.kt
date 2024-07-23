@@ -48,7 +48,7 @@ object HeadTowardsEnemyCityAutomation {
                 Log.error("Error while getting enemy cities by priority", e)
             }
         }
-        if (!DebugUtils.NEED_POST||flag==0){
+        if (!(DebugUtils.NEED_POST&&DebugUtils.TRY_NUM <=3)||flag==0){
             tryHeadTowardsEnemyCity(unit)
         }
         return false // No enemy city reachable

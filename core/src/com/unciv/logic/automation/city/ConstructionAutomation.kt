@@ -131,7 +131,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             }
 
         }
-        if (flag == 0||!(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)) {
+        if (flag == 0||!(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)) {
             addFoodBuildingChoice()
             addProductionBuildingChoice()
             addGoldBuildingChoice()

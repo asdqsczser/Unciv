@@ -87,7 +87,7 @@ object DiplomacyAutomation {
                 }
 
             }
-            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
                 if ((1..10).random() <= 2 && wantsToSignDeclarationOfFrienship(civInfo, otherCiv)) {
                     otherCiv.popupAlerts.add(PopupAlert(AlertType.DeclarationOfFriendship, civInfo.civName))
                 }
@@ -267,7 +267,7 @@ object DiplomacyAutomation {
                 }
 
             }
-            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
                 if ((1..10).random() <= 3 && wantsToOpenBorders(civInfo, otherCiv)) {
                     val tradeLogic = TradeLogic(civInfo, otherCiv)
                     tradeLogic.currentTrade.ourOffers.add(TradeOffer(Constants.openBorders, TradeType.Agreement))
@@ -361,7 +361,7 @@ object DiplomacyAutomation {
                 Log.error("Error while offering research agreement", e)
             }
         }
-        if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+        if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
             val canSignResearchAgreementCiv = civInfo.getKnownCivs()
                 .filter {
                     civInfo.diplomacyFunctions.canSignResearchAgreementsWith(it)
@@ -436,7 +436,7 @@ object DiplomacyAutomation {
                     Log.error("Error while offering a defensive pact", e)
                 }
             }
-            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+            if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
                 if ((1..10).random() <= 3 && wantsToSignDefensivePact(civInfo, otherCiv)) {
                     //todo: Add more in depth evaluation here
                     val tradeLogic = TradeLogic(civInfo, otherCiv)
@@ -634,7 +634,7 @@ object DiplomacyAutomation {
 //             if (civWithBestMotivationToAttack.second >= minMotivationToAttack)
 //                 civInfo.getDiplomacyManager(civWithBestMotivationToAttack.first).declareWar()
         }
-        if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+        if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
             val civWithBestMotivationToAttack = enemyCivs
                 .map { Pair(it, hasAtLeastMotivationToAttack(civInfo, it, minMotivationToAttack)) }
                 .maxByOrNull { it.second }!!
@@ -1000,7 +1000,7 @@ object DiplomacyAutomation {
                     Log.error("Error while offering a peace treaty", e)
                 }
             }
-           if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)){
+           if (flag==0||!(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
                 if(hasAtLeastMotivationToAttack(civInfo, enemy, 10) >= 10) {
                     // We can still fight. Refuse peace.
                     continue

@@ -186,7 +186,7 @@ object NextTurnAutomation {
                 val diploManager = civInfo.getDiplomacyManager(requestingCiv)
                 var jsonString: String
                 var flag = 1
-                if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+                if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) {
                     if (DebugUtils.NEED_GAMEINFO) {
                         val contentData = ContentDataV4(content, civInfo.civName, requestingCiv.civName,"Friendship")
                         jsonString = Json.encodeToString(contentData)
@@ -235,14 +235,11 @@ object NextTurnAutomation {
                     }
                     catch (e: Exception) {
                         flag = 0
-                        if (DebugUtils.TRY_NUM < 3)
-                            DebugUtils.TRY_NUM += 1
-                        else
-                            DebugUtils.NEED_POST = false
+                        DebugUtils.TRY_NUM += 1
                         Log.error("Error while wanting to declare friendship", e)
                     }
                 }
-                if (flag == 0 || !(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING)) {
+                if (flag == 0 || !(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)) {
                     if (civInfo.diplomacyFunctions.canSignDeclarationOfFriendshipWith(requestingCiv)
                         && DiplomacyAutomation.wantsToSignDeclarationOfFrienship(civInfo,requestingCiv)) {
                         diploManager.signDeclarationOfFriendship()
@@ -367,7 +364,7 @@ object NextTurnAutomation {
             return researchableTechs.toSortedMap().values.toList()
         }
         var flag = 1
-        if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING){
+        if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
             val jsonString: String
             if (DebugUtils.NEED_GAMEINFO){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
@@ -398,14 +395,11 @@ object NextTurnAutomation {
             }
             catch (e: Exception) {
                 flag = 0
-                if (DebugUtils.TRY_NUM < 3)
-                    DebugUtils.TRY_NUM += 1
-                else
-                    DebugUtils.NEED_POST = false
+                DebugUtils.TRY_NUM += 1
                 Log.error("Error while getting early decision", e)
             }
         }
-        if (flag == 0 || !(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING)){
+        if (flag == 0 || !(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3)){
             while(civInfo.tech.freeTechs > 0) {
                 val costs = getGroupedResearchableTechs()
                 if (costs.isEmpty()) return
