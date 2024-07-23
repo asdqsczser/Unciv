@@ -19,7 +19,7 @@ object DebugUtils {
      *  Does not update World View changes until finished.
      *  Set to 0 to disable.
      */
-    var SIMULATE_UNTIL_TURN: Int = 0
+    var SIMULATE_UNTIL_TURN: Int = 5
 
     /** Set it to true only when SIMULATE_UNTIL_TURN > 1 */
     var SIMULATEING: Boolean = false
@@ -39,6 +39,9 @@ object DebugUtils {
 
     var LLM_MODEL: String = ""
 
+    var TRY_NUM: Int = 0
+
+    var CONNECT_TIMEOUT: Int = 5
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
@@ -68,6 +71,8 @@ object DebugUtils {
                 LLM_API_KEY = value
             } else if (key.lowercase() == "LLM_MODEL".lowercase()) {
                 LLM_MODEL = value
+            } else if (key.lowercase() == "CONNECT_TIMEOUT".lowercase()) {
+                CONNECT_TIMEOUT = value.toInt()
             }
         }
         Log.debug(

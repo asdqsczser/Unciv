@@ -27,6 +27,7 @@ import com.unciv.models.translations.tr
 import com.unciv.ui.screens.victoryscreen.RankingType
 import com.unciv.utils.DebugUtils
 import com.unciv.utils.Log
+import io.ktor.network.sockets.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -54,7 +55,7 @@ object DiplomacyAutomation {
             // Default setting is 2, this will be changed according to different civ.
             var jsonString: String
             var flag = 1
-            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
                 if (DebugUtils.NEED_GAMEINFO){
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"change_closeness")
@@ -81,6 +82,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error while offering a declaration of friendship", e)
                 }
 
@@ -228,7 +230,7 @@ object DiplomacyAutomation {
         for (otherCiv in civsThatWeCanOpenBordersWith) {
             // Default setting is 3, this will be changed according to different civ.
             var flag = 1
-            if(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+            if(post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
                 if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                     val contentData = ContentDataV4(content, civInfo.civName, otherCiv.civName, "open_borders")
@@ -260,6 +262,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error while offering open borders", e)
                 }
 
@@ -334,7 +337,7 @@ object DiplomacyAutomation {
         if (!civInfo.diplomacyFunctions.canSignResearchAgreement()) return // don't waste your time
 //         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
         var flag = 1
-        if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+        if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) {
             try {
                 val canSignResearchAgreementCiv = civInfo.getKnownCivs()
                     .filter {
@@ -354,6 +357,7 @@ object DiplomacyAutomation {
             }
             catch (e: Exception) {
                 flag = 0
+                DebugUtils.TRY_NUM += 1
                 Log.error("Error while offering research agreement", e)
             }
         }
@@ -396,7 +400,7 @@ object DiplomacyAutomation {
             // Default setting is 3, this will be changed according to different civ.
             var jsonString: String
             var flag = 1
-            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
 //                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                 if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
@@ -428,6 +432,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception) {
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error while offering a defensive pact", e)
                 }
             }
@@ -584,7 +589,7 @@ object DiplomacyAutomation {
         val minMotivationToAttack = 20
         var jsonString: String
         var flag = 1
-        if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+        if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING &&DebugUtils.TRY_NUM <=3){
 //             val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
 //             var max_name = ""
 //             var max_score = 0
@@ -615,6 +620,7 @@ object DiplomacyAutomation {
                 }
                 catch(e: Exception){
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error while declaring War", e)
                 }
 
@@ -959,7 +965,7 @@ object DiplomacyAutomation {
         var jsonString: String
         var flag = 1
         for (enemy in enemiesCiv) {
-            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+            if (post&&DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
 //                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                 if (DebugUtils.NEED_GAMEINFO) {
                     val content = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
@@ -990,6 +996,7 @@ object DiplomacyAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error while offering a peace treaty", e)
                 }
             }
@@ -1028,7 +1035,7 @@ fun sendPostRequest(url: String, postData: String): String {
     connection.requestMethod = "POST"
     connection.setRequestProperty("Content-Type", "application/json")
     connection.doOutput = true
-
+    connection.connectTimeout = DebugUtils.CONNECT_TIMEOUT
     val wr = OutputStreamWriter(connection.outputStream)
     wr.write(postData)
     wr.flush()

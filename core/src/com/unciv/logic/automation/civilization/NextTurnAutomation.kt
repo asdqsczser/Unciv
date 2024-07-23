@@ -169,8 +169,8 @@ object NextTurnAutomation {
             }
         }
         catch (e: Exception) {
+            DebugUtils.TRY_NUM += 1
             Log.error("Error while getting early decision", e)
-            println(e)
         }
         ///
         for (popupAlert in civInfo.popupAlerts.toList()) { // toList because this can trigger other things that give alerts, like Golden Age
@@ -235,6 +235,10 @@ object NextTurnAutomation {
                     }
                     catch (e: Exception) {
                         flag = 0
+                        if (DebugUtils.TRY_NUM < 3)
+                            DebugUtils.TRY_NUM += 1
+                        else
+                            DebugUtils.NEED_POST = false
                         Log.error("Error while wanting to declare friendship", e)
                     }
                 }
@@ -394,6 +398,10 @@ object NextTurnAutomation {
             }
             catch (e: Exception) {
                 flag = 0
+                if (DebugUtils.TRY_NUM < 3)
+                    DebugUtils.TRY_NUM += 1
+                else
+                    DebugUtils.NEED_POST = false
                 Log.error("Error while getting early decision", e)
             }
         }

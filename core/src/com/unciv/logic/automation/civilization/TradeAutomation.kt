@@ -76,6 +76,10 @@ object TradeAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
+                    if (DebugUtils.TRY_NUM < 3)
+                        DebugUtils.TRY_NUM += 1
+                    else
+                        DebugUtils.NEED_POST = false
                     Log.error("Error occurred while replying to the trade", e)
                 }
 
@@ -268,8 +272,11 @@ object TradeAutomation {
                  }
              }
             catch (e: Exception){
-                Log.error("Fail:", e)
-                println(e)
+                Log.error("Error while propose common enemy", e)
+                if (DebugUtils.TRY_NUM < 3)
+                    DebugUtils.TRY_NUM += 1
+                else
+                    DebugUtils.NEED_POST = false
             }
          }
      }
@@ -345,6 +352,10 @@ object TradeAutomation {
             }
             catch (e: Exception){
                 flag = 0
+                if (DebugUtils.TRY_NUM < 3)
+                    DebugUtils.TRY_NUM += 1
+                else
+                    DebugUtils.NEED_POST = false
                 Log.error("Error occurred while replying to the trade", e)
             }
 

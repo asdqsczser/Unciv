@@ -96,7 +96,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
         if (cityConstructions.getCurrentConstruction() !is PerpetualConstruction) return  // don't want to be stuck on these forever
         var chosenConstruction = ""
         var flag = 1
-        if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING) {
+        if(DebugUtils.NEED_POST && !DebugUtils.SIMULATEING && DebugUtils.TRY_NUM <=3) {
             val jsonString: String
             if (DebugUtils.NEED_GAMEINFO){
                 val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
@@ -126,6 +126,7 @@ class ConstructionAutomation(val cityConstructions: CityConstructions){
             }
             catch (e: Exception){
                 flag = 0
+                DebugUtils.TRY_NUM += 1
                 Log.error("Error while choosing next construction", e)
             }
 
