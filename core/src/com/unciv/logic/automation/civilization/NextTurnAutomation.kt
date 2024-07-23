@@ -41,38 +41,32 @@ object NextTurnAutomation {
     /** Top-level AI turn task list */
     fun automateCivMoves(civInfo: Civilization) {
         if (civInfo.isBarbarian()) return BarbarianAutomation(civInfo).automate()
-        if (civInfo.gameInfo.turns % 5 == 0 || civInfo.gameInfo.turns % 5 == 1) {
-
-            respondToPopupAlerts(civInfo)
-            TradeAutomation.respondToTradeRequests(civInfo)//
-        }
-        if (civInfo.gameInfo.turns % 5 == 0){
-            if (civInfo.isMajorCiv()) {
-                if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
-                    if (DebugUtils.ACTIVE_DIPLOMACY) {
-                        DiplomacyAutomation.declareWar(civInfo)
-                        DiplomacyAutomation.offerPeaceTreaty(civInfo)
-                        DiplomacyAutomation.offerDeclarationOfFriendship(civInfo)
-                    }
-                }
-                if (civInfo.gameInfo.isReligionEnabled()) {
-                    ReligionAutomation.spendFaithOnReligion(civInfo)//
-                }
+        respondToPopupAlerts(civInfo)
+        TradeAutomation.respondToTradeRequests(civInfo)//
+        if (civInfo.isMajorCiv()) {
+            if (!civInfo.gameInfo.ruleset.modOptions.hasUnique(ModOptionsConstants.diplomaticRelationshipsCannotChange)) {
                 if (DebugUtils.ACTIVE_DIPLOMACY) {
-                    DiplomacyAutomation.offerOpenBorders(civInfo)
-                    DiplomacyAutomation.offerResearchAgreement(civInfo)
-                    DiplomacyAutomation.offerDefensivePact(civInfo)
+                    DiplomacyAutomation.declareWar(civInfo)
+                    DiplomacyAutomation.offerPeaceTreaty(civInfo)
+                    DiplomacyAutomation.offerDeclarationOfFriendship(civInfo)
                 }
-                TradeAutomation.exchangeLuxuries(civInfo)
-                TradeAutomation.proposeCommonEnemy(civInfo)
-                issueRequests(civInfo)
-                adoptPolicy(civInfo)  // todo can take a second - why?
-                freeUpSpaceResources(civInfo)
-            } else {
-                civInfo.cityStateFunctions.getFreeTechForCityState()
-                civInfo.cityStateFunctions.updateDiplomaticRelationshipForCityState()
             }
-
+            if (civInfo.gameInfo.isReligionEnabled()) {
+                ReligionAutomation.spendFaithOnReligion(civInfo)//
+            }
+            if (DebugUtils.ACTIVE_DIPLOMACY) {
+                DiplomacyAutomation.offerOpenBorders(civInfo)
+                DiplomacyAutomation.offerResearchAgreement(civInfo)
+                DiplomacyAutomation.offerDefensivePact(civInfo)
+            }
+            TradeAutomation.exchangeLuxuries(civInfo)
+            TradeAutomation.proposeCommonEnemy(civInfo)
+            issueRequests(civInfo)
+            adoptPolicy(civInfo)  // todo can take a second - why?
+            freeUpSpaceResources(civInfo)
+        } else {
+            civInfo.cityStateFunctions.getFreeTechForCityState()
+            civInfo.cityStateFunctions.updateDiplomaticRelationshipForCityState()
         }
 
         chooseTechToResearch(civInfo)
@@ -162,7 +156,7 @@ object NextTurnAutomation {
         val content = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
 
         try {
-            if (civInfo.gameInfo.turns % 5 == 0 && DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+            if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) {
                 val contentData = ContentDataV2(content, civInfo.civName)
                 val jsonString = Json.encodeToString(contentData)
                 sendPostRequest(DebugUtils.AI_SERVER_ADDRESS+"get_early_decision", jsonString)
