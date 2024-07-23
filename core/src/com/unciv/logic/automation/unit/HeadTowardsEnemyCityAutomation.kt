@@ -25,7 +25,7 @@ object HeadTowardsEnemyCityAutomation {
     fun tryHeadTowardsEnemyCity_civsim(unit: MapUnit, id:Int): Boolean {
         if (unit.civ.cities.isEmpty()) return false
         var flag = 1
-        if (DebugUtils.NEED_POST){
+        if (DebugUtils.NEED_POST&&DebugUtils.TRY_NUM<=3){
             try {
                 val content = UncivFiles.gameInfoToString(unit.civ.gameInfo,false,false)
                 val contentData = ContentDataUnit(content, unit.civ.civName,id.toString())
@@ -44,10 +44,11 @@ object HeadTowardsEnemyCityAutomation {
             }
             catch (e:Exception){
                 flag = 0
+                DebugUtils.TRY_NUM += 1
                 Log.error("Error while getting enemy cities by priority", e)
             }
         }
-        if (!DebugUtils.NEED_POST||flag==0){
+        if (!(DebugUtils.NEED_POST&&DebugUtils.TRY_NUM <=3)||flag==0){
             tryHeadTowardsEnemyCity(unit)
         }
         return false // No enemy city reachable

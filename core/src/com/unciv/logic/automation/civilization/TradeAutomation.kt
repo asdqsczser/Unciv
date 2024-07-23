@@ -44,7 +44,7 @@ object TradeAutomation {
              */
             civInfo.tradeRequests.remove(tradeRequest)
             var flag = 1
-            if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+            if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
                 var jsonString: String
                 if(DebugUtils.NEED_GAMEINFO){
                     val contentData = ContentDataV4(content, civInfo.civName,otherCiv.civName,"trade")
@@ -76,11 +76,12 @@ object TradeAutomation {
                 }
                 catch (e: Exception){
                     flag = 0
+                    DebugUtils.TRY_NUM += 1
                     Log.error("Error occurred while replying to the trade", e)
                 }
 
             }
-            if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) || flag == 0 ){
+            if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) || flag == 0 ){
                 if (TradeEvaluation().isTradeAcceptable(tradeLogic.currentTrade, civInfo, otherCiv)) {
                     tradeLogic.acceptTrade()
                     otherCiv.addNotification("[${civInfo.civName}] has accepted your trade request", NotificationCategory.Trade, NotificationIcon.Trade, civInfo.civName)
@@ -220,7 +221,7 @@ object TradeAutomation {
      fun proposeCommonEnemy(civInfo: Civilization){
 //          val tradeLogic = TradeLogic(civInfo, otherCivInfo)
          val jsonString: String
-         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) {
+         if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) {
              if (DebugUtils.NEED_GAMEINFO) {
                  val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo,false,false)
                  val contentData = ContentDataV4(gameinfo, civInfo.civName,civInfo.civName,"common_enemy")
@@ -268,8 +269,8 @@ object TradeAutomation {
                  }
              }
             catch (e: Exception){
-                Log.error("Fail:", e)
-                println(e)
+                Log.error("Error while propose common enemy", e)
+                DebugUtils.TRY_NUM += 1
             }
          }
      }
@@ -304,7 +305,7 @@ object TradeAutomation {
         val tradeLogic = TradeLogic(civInfo, otherCivInfo)
         var jsonString : String
         var flag = 1
-        if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING){
+        if (DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3){
             if (DebugUtils.NEED_GAMEINFO) {
                 val gameinfo = UncivFiles.gameInfoToString(civInfo.gameInfo, false, false)
                 val contentData = ContentDataV4(gameinfo, civInfo.civName, otherCivInfo.civName, "buy_luxury")
@@ -345,11 +346,12 @@ object TradeAutomation {
             }
             catch (e: Exception){
                 flag = 0
+                DebugUtils.TRY_NUM += 1
                 Log.error("Error occurred while replying to the trade", e)
             }
 
         }
-        if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING) || flag == 0){
+        if (!(DebugUtils.NEED_POST&&!DebugUtils.SIMULATEING&&DebugUtils.TRY_NUM <=3) || flag == 0){
             val ourTradableLuxuryResources = tradeLogic.ourAvailableOffers
                 .filter { it.type == TradeType.Luxury_Resource && it.amount > 1 }
             val theirTradableLuxuryResources = tradeLogic.theirAvailableOffers

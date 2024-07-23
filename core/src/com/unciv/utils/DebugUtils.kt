@@ -39,6 +39,9 @@ object DebugUtils {
 
     var LLM_MODEL: String = ""
 
+    var TRY_NUM: Int = 0
+
+    var CONNECT_TIMEOUT: Int = 5
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
@@ -68,6 +71,8 @@ object DebugUtils {
                 LLM_API_KEY = value
             } else if (key.lowercase() == "LLM_MODEL".lowercase()) {
                 LLM_MODEL = value
+            } else if (key.lowercase() == "CONNECT_TIMEOUT".lowercase()) {
+                CONNECT_TIMEOUT = value.toInt()
             }
         }
         Log.debug(

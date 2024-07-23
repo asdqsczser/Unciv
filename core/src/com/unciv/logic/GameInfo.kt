@@ -346,6 +346,7 @@ class GameInfo : IsPartOfGameInfoSerialization, HasGameInfoSerializationVersion 
         var humanid= 0
         var newturns = 0
         var flag=0
+        DebugUtils.TRY_NUM = 0
         // We rotate Players in cycle: 1,2...N,1,2...
         fun setNextPlayer() {
             playerIndex = (playerIndex + 1) % civilizations.size
