@@ -1,5 +1,7 @@
 package com.unciv.utils
+
 import com.unciv.utils.Log
+
 object DebugUtils {
 
     /**
@@ -89,6 +91,7 @@ object DebugUtils {
             "VISIBLE_MAP: $VISIBLE_MAP"
             "LLM_API_KEY: $LLM_API_KEY"
             "LLM_MODEL: $LLM_MODEL"
+            "CONNECT_TIMEOUT": $CONNECT_TIMEOUT"
             """.trimIndent()
         )
     }
