@@ -43,7 +43,7 @@ object DebugUtils {
 
     var TRY_NUM: Int = 0
 
-    var CONNECT_TIMEOUT: Int = 5000
+    var CONNECT_TIMEOUT: Int = 2000
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
