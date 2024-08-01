@@ -989,7 +989,7 @@ object DiplomacyAutomation {
                     }
 //                 val score = postRequestResult.toInt()
 //             if(hasAtLeastMotivationToAttack(civInfo, enemy, 10) >= 10) {
-                    if (resultValue == false){
+                    if (resultValue != true){
                         // We can still fight. Refuse peace.
                         continue
                     }

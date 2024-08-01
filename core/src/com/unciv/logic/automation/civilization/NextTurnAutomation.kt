@@ -216,7 +216,7 @@ object NextTurnAutomation {
                                 NotificationIcon.Diplomacy,
                                 civInfo.civName
                             )
-                        } else {
+                        } else if (resultValue == false) {
                             diploManager.otherCivDiplomacy()
                                 .setFlag(DiplomacyFlags.DeclinedDeclarationOfFriendship, 10)
                             requestingCiv.addNotification(
@@ -226,6 +226,7 @@ object NextTurnAutomation {
                                 civInfo.civName
                             )
                         }
+                        else break
                     }
                     catch (e: Exception) {
                         flag = 0

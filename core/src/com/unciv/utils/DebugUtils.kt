@@ -43,7 +43,7 @@ object DebugUtils {
 
     var TRY_NUM: Int = 0
 
-    var CONNECT_TIMEOUT: Int = 5
+    var CONNECT_TIMEOUT: Int = 5000
     fun initialize(args: Array<String>) {
         if (args.isEmpty()) return
         for (arg in args) {
@@ -91,7 +91,7 @@ object DebugUtils {
             "VISIBLE_MAP: $VISIBLE_MAP"
             "LLM_API_KEY: $LLM_API_KEY"
             "LLM_MODEL: $LLM_MODEL"
-            "CONNECT_TIMEOUT": $CONNECT_TIMEOUT"
+            "CONNECT_TIMEOUT: $CONNECT_TIMEOUT"
             """.trimIndent()
         )
     }

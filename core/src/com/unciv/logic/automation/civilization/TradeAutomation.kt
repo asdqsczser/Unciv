@@ -70,7 +70,7 @@ object TradeAutomation {
                     if(resultValue == true){
                         tradeLogic.acceptTrade()
                         otherCiv.addNotification("[${civInfo.civName}] has accepted your trade request", NotificationCategory.Trade, NotificationIcon.Trade, civInfo.civName)
-                    }else{
+                    }else if(resultValue == false){
                         tradeRequest.decline(civInfo)
                     }
                 }
