@@ -331,9 +331,9 @@ object TradeAutomation {
                 val trades = ArrayList<Trade>()
                 if(resultValue == true){
                     val ourTradableLuxuryResources = tradeLogic.ourAvailableOffers
-                        .filter { it.type == TradeType.Gold_Per_Turn && it.amount > goldElement!! }
+                        .filter { it.type == TradeType.Gold }
                     val theirTradableLuxuryResources = tradeLogic.theirAvailableOffers
-                        .filter { it.name == luxuryElement &&it.type == TradeType.Luxury_Resource && it.amount > 1 }
+                        .filter { it.name == luxuryElement && it.type == TradeType.Luxury_Resource && it.amount > 0 }
                     if (ourTradableLuxuryResources.isNotEmpty() && theirTradableLuxuryResources.isNotEmpty()) {
                         val trade = Trade()
                         trade.ourOffers.add(ourTradableLuxuryResources[0].copy(amount = goldElement!!))
